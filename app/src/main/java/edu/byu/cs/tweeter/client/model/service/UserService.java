@@ -1,54 +1,38 @@
 package edu.byu.cs.tweeter.client.model.service;
 
-import edu.byu.cs.tweeter.client.model.service.backgroundTask.BackgroundTaskUtils;
-import edu.byu.cs.tweeter.client.model.service.backgroundTask.LoginTask;
-import edu.byu.cs.tweeter.client.model.service.backgroundTask.handler.LoginTaskHandler;
-import edu.byu.cs.tweeter.model.domain.AuthToken;
+import android.os.Bundle;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.BackgroundTaskHandler;
+import edu.byu.cs.tweeter.client.model.service.backgroundTask.GetUserTask;
+import edu.byu.cs.tweeter.client.model.service.observer.GetUserObserver;
 import edu.byu.cs.tweeter.model.domain.User;
 
-/**
- * Contains the business logic to support the login operation.
- */
-public class UserService {
+public class UserService extends TweeterService{
 
-    public static final String URL_PATH = "/login";
 
-    /**
-     * An observer interface to be implemented by observers who want to be notified when
-     * asynchronous operations complete.
-     */
-    public interface LoginObserver {
-        void handleSuccess(User user, AuthToken authToken);
-        void handleFailure(String message);
-        void handleException(Exception exception);
+    private class GetUserHandler extends BackgroundTaskHandler<GetUserObserver> {
+
+        public GetUserHandler(GetUserObserver observer) {
+            super(observer);
+        }
+
+        @Override
+        protected void handleSuccess(Bundle data, GetUserObserver observer) {
+            User user = (User) data.getSerializable(GetUserTask.USER_KEY);
+            observer.handleSuccess(user);
+        }
     }
 
-    /**
-     * Creates an instance.
-     *
-     */
-     public UserService() {
-     }
 
-    /**
-     * Makes an asynchronous login request.
-     *
-     * @param username the user's name.
-     * @param password the user's password.
-     */
-    public void login(String username, String password, LoginObserver observer) {
-        LoginTask loginTask = getLoginTask(username, password, observer);
-        BackgroundTaskUtils.runTask(loginTask);
+    public void getUserTask(String aliasString, GetUserObserver observer) {
+        GetUserTask getUserTask = new GetUserTask(Cache.getInstance().getCurrUserAuthToken(),
+                aliasString, new GetUserHandler(observer));
+        executeTask(getUserTask);
+        observer.displayMessage("Getting user's profile...");
     }
 
-    /**
-     * Returns an instance of {@link LoginTask}. Allows mocking of the LoginTask class for
-     * testing purposes. All usages of LoginTask should get their instance from this method to
-     * allow for proper mocking.
-     *
-     * @return the instance.
-     */
-    LoginTask getLoginTask(String username, String password, LoginObserver observer) {
-        return new LoginTask(this, username, password, new LoginTaskHandler(observer));
-    }
 }
