@@ -1,12 +1,17 @@
 package edu.byu.cs.tweeter.server.service;
 
+import edu.byu.cs.tweeter.model.net.request.CountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
 import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowersCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
@@ -71,6 +76,26 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         }
         return getFollowingDAO().isFollower();
+    }
+
+    public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
+        getCountCheck(request);
+        FollowDAO followDAO = new FollowDAO();
+        return followDAO.getFollowersCount();
+    }
+
+    public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
+        getCountCheck(request);
+        FollowDAO followDAO = new FollowDAO();
+        return followDAO.getFollowingCount();
+    }
+
+    private void getCountCheck(CountRequest request) {
+        if (request.getAuthToken() == null) {
+            throw new RuntimeException("[Bad Request] Request needs to have an authToken");
+        } else if (request.getTargetUser() == null){
+            throw new RuntimeException("[Bad Request] Request needs to have a target user");
+        }
     }
 
 

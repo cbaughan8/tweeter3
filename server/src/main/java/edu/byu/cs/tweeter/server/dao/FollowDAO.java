@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowersCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
@@ -131,6 +134,13 @@ public class FollowDAO {
 
     public IsFollowerResponse isFollower() {
         return new IsFollowerResponse(true);
+    }
+    public FollowersCountResponse getFollowersCount() {
+        return new FollowersCountResponse(20);
+    }
+
+    public FollowingCountResponse getFollowingCount() {
+        return new FollowingCountResponse(20);
     }
 
     /**
