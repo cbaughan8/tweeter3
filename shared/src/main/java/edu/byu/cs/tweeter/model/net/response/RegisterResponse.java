@@ -22,7 +22,33 @@ public class RegisterResponse extends Response {
         super(false, message);
     }
 
-    public RegisterResponse(boolean success, String message) {
-        super(success, message);
+    /**
+     * Creates a response indicating that the corresponding request was successful.
+     *
+     * @param user the now register in user.
+     * @param authToken the auth token representing this user's session with the server.
+     */
+    public RegisterResponse(User user, AuthToken authToken) {
+        super(true, null);
+        this.user = user;
+        this.authToken = authToken;
+    }
+
+    /**
+     * Returns the registered in user.
+     *
+     * @return the user.
+     */
+    public User getUser() {
+        return user;
+    }
+
+    /**
+     * Returns the auth token.
+     *
+     * @return the auth token.
+     */
+    public AuthToken getAuthToken() {
+        return authToken;
     }
 }

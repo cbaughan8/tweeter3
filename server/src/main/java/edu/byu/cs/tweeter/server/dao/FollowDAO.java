@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
+import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
+import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
+import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 
 /**
@@ -48,7 +53,7 @@ public class FollowDAO {
 
         if(request.getLimit() > 0) {
             if (allFollowees != null) {
-                int followeesIndex = getFolloweesStartingIndex(request.getLastFolloweeAlias(), allFollowees);
+                int followeesIndex = getStartingIndex(request.getLastFolloweeAlias(), allFollowees);
 
                 for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
                     responseFollowees.add(allFollowees.get(followeesIndex));
@@ -61,25 +66,50 @@ public class FollowDAO {
         return new FollowingResponse(responseFollowees, hasMorePages);
     }
 
+    public FollowersResponse getFollowers(FollowersRequest request) {
+        // TODO: Generates dummy data. Replace with a real implementation.
+        assert request.getLimit() > 0;
+        assert request.getFolloweeAlias() != null;
+
+        List<User> allFollowers = getDummyFollowees();
+        List<User> responseFollowers = new ArrayList<>(request.getLimit());
+
+        boolean hasMorePages = false;
+
+        if(request.getLimit() > 0) {
+            if (allFollowers != null) {
+                int followeesIndex = getStartingIndex(request.getLastFollowerAlias(), allFollowers);
+
+                for(int limitCounter = 0; followeesIndex < allFollowers.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
+                    responseFollowers.add(allFollowers.get(followeesIndex));
+                }
+
+                hasMorePages = followeesIndex < allFollowers.size();
+            }
+        }
+
+        return new FollowersResponse(responseFollowers, hasMorePages);
+    }
+
     /**
      * Determines the index for the first followee in the specified 'allFollowees' list that should
      * be returned in the current request. This will be the index of the next followee after the
      * specified 'lastFollowee'.
      *
-     * @param lastFolloweeAlias the alias of the last followee that was returned in the previous
+     * @param lastPersonAlias the alias of the last followee that was returned in the previous
      *                          request or null if there was no previous request.
-     * @param allFollowees the generated list of followees from which we are returning paged results.
+     * @param allPeople the generated list of followees from which we are returning paged results.
      * @return the index of the first followee to be returned.
      */
-    private int getFolloweesStartingIndex(String lastFolloweeAlias, List<User> allFollowees) {
+    private int getStartingIndex(String lastPersonAlias, List<User> allPeople) {
 
         int followeesIndex = 0;
 
-        if(lastFolloweeAlias != null) {
+        if(lastPersonAlias != null) {
             // This is a paged request for something after the first page. Find the first item
             // we should return
-            for (int i = 0; i < allFollowees.size(); i++) {
-                if(lastFolloweeAlias.equals(allFollowees.get(i).getAlias())) {
+            for (int i = 0; i < allPeople.size(); i++) {
+                if(lastPersonAlias.equals(allPeople.get(i).getAlias())) {
                     // We found the index of the last item returned last time. Increment to get
                     // to the first one we should return
                     followeesIndex = i + 1;
@@ -89,6 +119,18 @@ public class FollowDAO {
         }
 
         return followeesIndex;
+    }
+
+    //TODO: Make real functionality
+    public FollowResponse follow() {
+        return new FollowResponse();
+    }
+    public UnfollowResponse unfollow() {
+        return new UnfollowResponse();
+    }
+
+    public IsFollowerResponse isFollower() {
+        return new IsFollowerResponse(true);
     }
 
     /**
@@ -110,4 +152,7 @@ public class FollowDAO {
     FakeData getFakeData() {
         return FakeData.getInstance();
     }
+
+
+
 }
