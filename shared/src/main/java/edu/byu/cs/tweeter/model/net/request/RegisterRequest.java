@@ -1,20 +1,37 @@
 package edu.byu.cs.tweeter.model.net.request;
 
 public class RegisterRequest {
+
+    private String firstName;
+    private String lastName;
     private String username;
     private String password;
-    private String alias;
-    private String email;
     private String imageBytesBase64;
 
     private RegisterRequest() {}
 
-    public RegisterRequest(String username, String password, String alias, String email, String imageBytesBase64) {
+    public RegisterRequest(String firstName, String lastName, String username, String password, String imageBytesBase64) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.username = username;
         this.password = password;
-        this.alias = alias;
-        this.email = email;
         this.imageBytesBase64 = imageBytesBase64;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -33,21 +50,6 @@ public class RegisterRequest {
         this.password = password;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getImageBytesBase64() {
         return imageBytesBase64;

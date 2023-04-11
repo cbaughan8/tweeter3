@@ -2,11 +2,15 @@ package edu.byu.cs.tweeter.client.model.service.backgroundTask;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.response.AuthenticatedResponse;
+import edu.byu.cs.tweeter.model.net.response.Response;
 import edu.byu.cs.tweeter.util.Pair;
 
 public abstract class AuthenticateTask extends BackgroundTask {
@@ -14,9 +18,11 @@ public abstract class AuthenticateTask extends BackgroundTask {
     public static final String USER_KEY = "user";
     public static final String AUTH_TOKEN_KEY = "auth-token";
 
-    private User authenticatedUser;
+    private static final String LOG_TAG = "AuthenticateTask";
 
-    private AuthToken authToken;
+    protected User authenticatedUser;
+
+    protected AuthToken authToken;
 
     /**
      * The user's username (or "alias" or "handle"). E.g., "@susan".
@@ -34,21 +40,38 @@ public abstract class AuthenticateTask extends BackgroundTask {
         this.password = password;
     }
 
+    @Override
+    protected void recordResponseItems(AuthenticatedResponse response) {
+        authenticatedUser = response.getUser();
+        authToken = response.getAuthToken();
+    }
 
     @Override
-    protected final void runTask()  throws IOException {
-        Pair<User, AuthToken> loginResult = runAuthenticationTask();
+    protected final AuthenticatedResponse runTask() throws IOException, TweeterRemoteException {
+//        Pair<User, AuthToken> loginResult =
+        return runAuthenticationTask();
+//        try {
+//            if (response.isSuccess()) {
+//                authenticatedUser = response.getUser();
+//                authToken = response.getAuthToken();
+//                sendSuccessMessage();
+//            } else {
+//                sendFailedMessage(response.getMessage());
+//            }
+//        } catch (Exception ex) {
+//            Log.e(LOG_TAG, ex.getMessage(), ex);
+//            sendExceptionMessage(ex);
+//        }
 
-        authenticatedUser = loginResult.getFirst();
-        authToken = loginResult.getSecond();
+//        authenticatedUser = loginResult.getFirst();
+//        authToken = loginResult.getSecond();
 
         // Call sendSuccessMessage if successful
-        sendSuccessMessage();
         // or call sendFailedMessage if not successful
         // sendFailedMessage()
     }
 
-    protected abstract Pair<User, AuthToken> runAuthenticationTask();
+    protected abstract AuthenticatedResponse runAuthenticationTask() throws IOException, TweeterRemoteException;
 
     @Override
     protected void loadSuccessBundle(Bundle msgBundle) {

@@ -33,10 +33,10 @@ public class UserService {
             throw new RuntimeException("[Bad Request] Missing a username");
         } else if(request.getPassword() == null) {
             throw new RuntimeException("[Bad Request] Missing a password");
-        } else if(request.getAlias() == null) {
-        throw new RuntimeException("[Bad Request] Missing an alias");
-        } else if(request.getEmail() == null) {
-            throw new RuntimeException("[Bad Request] Missing an email");
+        } else if(request.getFirstName() == null) {
+        throw new RuntimeException("[Bad Request] Missing a first name");
+        } else if(request.getLastName() == null) {
+            throw new RuntimeException("[Bad Request] Missing a last name");
         } else if(request.getImageBytesBase64() == null) {
             throw new RuntimeException("[Bad Request] Missing an image");
         }

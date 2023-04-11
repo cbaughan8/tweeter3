@@ -7,10 +7,7 @@ import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 /**
  * A response for a {@link RegisterRequest}.
  */
-public class RegisterResponse extends Response {
-
-    private User user;
-    private AuthToken authToken;
+public class RegisterResponse extends AuthenticatedResponse {
 
 
     /**
@@ -19,7 +16,7 @@ public class RegisterResponse extends Response {
      * @param message a message describing why the request was unsuccessful.
      */
     public RegisterResponse(String message) {
-        super(false, message);
+        super(message);
     }
 
     /**
@@ -29,26 +26,8 @@ public class RegisterResponse extends Response {
      * @param authToken the auth token representing this user's session with the server.
      */
     public RegisterResponse(User user, AuthToken authToken) {
-        super(true, null);
-        this.user = user;
-        this.authToken = authToken;
+        super(user, authToken);
     }
 
-    /**
-     * Returns the registered in user.
-     *
-     * @return the user.
-     */
-    public User getUser() {
-        return user;
-    }
 
-    /**
-     * Returns the auth token.
-     *
-     * @return the auth token.
-     */
-    public AuthToken getAuthToken() {
-        return authToken;
-    }
 }

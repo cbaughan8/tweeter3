@@ -1,6 +1,6 @@
 package edu.byu.cs.tweeter.model.net.response;
 
-public class CountResponse extends Response {
+public abstract class CountResponse extends Response {
 
     int count;
 
