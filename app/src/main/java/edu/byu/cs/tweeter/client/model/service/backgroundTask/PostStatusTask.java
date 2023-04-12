@@ -45,13 +45,6 @@ public class PostStatusTask extends AuthenticatedTask {
             Log.e(LOG_TAG, ex.getMessage(), ex);
             sendExceptionMessage(ex);
         }
-        // We could do this from the presenter, without a task and handler, but we will
-        // eventually access the database from here when we aren't using dummy data.
-
-        // Call sendSuccessMessage if successful
-//        sendSuccessMessage();
-        // or call sendFailedMessage if not successful
-        // sendFailedMessage()
     }
 
 }
