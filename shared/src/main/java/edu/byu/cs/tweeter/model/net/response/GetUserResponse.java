@@ -4,6 +4,9 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public class GetUserResponse extends Response {
 
+    private static final String LOG_TAG = "GetUserTask";
+    public static final String URL_PATH = "/isfollower";
+
     User user;
 
     public GetUserResponse(String message) {

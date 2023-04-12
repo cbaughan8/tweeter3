@@ -9,6 +9,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.response.Response;
+import edu.byu.cs.tweeter.model.net.response.ToggleFollowResponse;
 
 /**
  * Background task that removes a following relationship between two users.
@@ -22,7 +23,7 @@ public class UnfollowTask extends ToggleFollowTask {
     }
 
     @Override
-    public Response getResponse() throws IOException, TweeterRemoteException {
+    public ToggleFollowResponse getResponse() throws IOException, TweeterRemoteException {
         FollowRequest request = new FollowRequest(authToken, followee);
         return getServerFacade().unfollow(request, URL_PATH);
     }

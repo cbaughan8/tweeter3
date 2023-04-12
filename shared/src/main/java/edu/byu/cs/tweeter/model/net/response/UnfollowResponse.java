@@ -1,10 +1,10 @@
 package edu.byu.cs.tweeter.model.net.response;
 
-public class UnfollowResponse extends Response {
+public class UnfollowResponse extends ToggleFollowResponse {
     public UnfollowResponse(String message) {
-        super(false, message);
+        super(message);
     }
     public UnfollowResponse() {
-        super(true, null);
+        super();
     }
 }
