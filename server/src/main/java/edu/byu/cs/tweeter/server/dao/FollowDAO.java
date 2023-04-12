@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.server.dao;
 
 import java.util.List;
+import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
@@ -110,7 +111,7 @@ public class FollowDAO {
     }
 
     public IsFollowerResponse isFollower() {
-        return new IsFollowerResponse(true);
+        return new IsFollowerResponse(new Random().nextInt() > 0);
     }
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
