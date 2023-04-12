@@ -81,13 +81,13 @@ public class FollowService {
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
         FollowDAO followDAO = new FollowDAO();
-        return followDAO.getFollowersCount();
+        return followDAO.getFollowersCount(request);
     }
 
     public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
         getCountCheck(request);
         FollowDAO followDAO = new FollowDAO();
-        return followDAO.getFollowingCount();
+        return followDAO.getFollowingCount(request);
     }
 
     private void getCountCheck(CountRequest request) {

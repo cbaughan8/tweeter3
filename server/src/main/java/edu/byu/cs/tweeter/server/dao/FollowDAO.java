@@ -6,6 +6,7 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersCountResponse;
@@ -58,7 +59,8 @@ public class FollowDAO {
             if (allFollowees != null) {
                 int followeesIndex = getStartingIndex(request.getLastFolloweeAlias(), allFollowees);
 
-                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
+                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit();
+                    followeesIndex++, limitCounter++) {
                     responseFollowees.add(allFollowees.get(followeesIndex));
                 }
 
@@ -135,12 +137,12 @@ public class FollowDAO {
     public IsFollowerResponse isFollower() {
         return new IsFollowerResponse(true);
     }
-    public FollowersCountResponse getFollowersCount() {
-        return new FollowersCountResponse(20);
+    public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
+        return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
     }
 
-    public FollowingCountResponse getFollowingCount() {
-        return new FollowingCountResponse(20);
+    public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
+        return new FollowingCountResponse(getFolloweeCount(request.getTargetUser()));
     }
 
     /**

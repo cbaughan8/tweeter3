@@ -13,6 +13,7 @@ import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.StoryResponse;
 import edu.byu.cs.tweeter.util.FakeData;
+import edu.byu.cs.tweeter.util.Pair;
 
 public class StatusDAO {
     public PostStatusResponse postStatus() {
@@ -21,13 +22,17 @@ public class StatusDAO {
 
     public FeedResponse getFeed(FeedRequest request) {
         boolean hasMorePages = false;
-        List<Status> responseFeed = getDummyStatuses(request, hasMorePages);
+        Pair<List<Status>, Boolean> dummyData = getDummyStatuses(request, hasMorePages);
+        List<Status> responseFeed = dummyData.getFirst();
+        hasMorePages = dummyData.getSecond();
         return new FeedResponse(responseFeed, hasMorePages);
     }
 
     public StoryResponse getStory(StoryRequest request) {
         boolean hasMorePages = false;
-        List<Status> responseStory = getDummyStatuses(request, hasMorePages);
+        Pair<List<Status>, Boolean> dummyData = getDummyStatuses(request, hasMorePages);
+        List<Status> responseStory = dummyData.getFirst();
+        hasMorePages = dummyData.getSecond();
         return new StoryResponse(responseStory, hasMorePages);
     }
 
@@ -50,7 +55,7 @@ public class StatusDAO {
         return followeesIndex;
     }
 
-    private List<Status> getDummyStatuses(PagedStatusRequest request, boolean hasMorePages) {
+    private Pair<List<Status>, Boolean> getDummyStatuses(PagedStatusRequest request, boolean hasMorePages) {
         assert request.getLimit() > 0;
         assert request.getTargetUser() != null;
 
@@ -69,7 +74,7 @@ public class StatusDAO {
                 hasMorePages = index < allStatuses.size();
             }
         }
-        return responseFeed;
+        return new Pair<>(responseFeed, hasMorePages);
     }
 
     List<Status> getDummyFeed() {

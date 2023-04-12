@@ -2,13 +2,19 @@ package edu.byu.cs.tweeter.client.model.service.backgroundTask;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+
+import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.response.CountResponse;
 
 public abstract class GetCountTask extends AuthenticatedTask {
 
     public static final String COUNT_KEY = "count";
+    public static final String LOG_TAG = "GetCountTask";
 
     /**
      * The user whose count is being retrieved.
@@ -28,16 +34,28 @@ public abstract class GetCountTask extends AuthenticatedTask {
     }
 
     @Override
-    protected void runTask() {
-        count = runCountTask();
+    protected void runTask() throws IOException, TweeterRemoteException {
+        CountResponse response = runCountTask();
+
+        try {
+            if (response.isSuccess()) {
+                count = response.getCount();
+                sendSuccessMessage();
+            } else {
+                sendFailedMessage(response.getMessage());
+            }
+        } catch (Exception ex) {
+            Log.e(LOG_TAG, ex.getMessage(), ex);
+            sendExceptionMessage(ex);
+        }
 
         // Call sendSuccessMessage if successful
-        sendSuccessMessage();
+//        sendSuccessMessage();
         // or call sendFailedMessage if not successful
         // sendFailedMessage()
     }
 
-    protected abstract int runCountTask();
+    protected abstract CountResponse runCountTask() throws IOException, TweeterRemoteException;
 
     @Override
     protected void loadSuccessBundle(Bundle msgBundle) {

@@ -36,12 +36,13 @@ public class StatusService {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         } else if (request.getTargetUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a target user");
-        } else if (request.getLimit() <= 0) {
+        } else if (request.getLimit() < 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
         }
-//        } else if (request.getLastStatus() == null) {
+//        else if (request.getLastStatus() == null) {
 //            throw new RuntimeException("[Bad Request] Request needs to have a last status");
 //        }
+        // when deleted the feed appears twice
     }
 
     public StatusDAO getStatusDao() {

@@ -8,7 +8,7 @@ public abstract class PagedStatusRequest {
     private AuthToken authToken;
     private User targetUser;
     private int limit;
-    private Status lastStatus;
+    public Status lastStatus;
 
     protected PagedStatusRequest() {}
 
