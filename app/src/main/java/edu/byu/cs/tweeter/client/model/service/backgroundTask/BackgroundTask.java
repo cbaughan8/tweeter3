@@ -31,29 +31,17 @@ public abstract class BackgroundTask implements Runnable {
 
     @Override
     public void run() {
+
         try {
-            Response response = runTask();
-            if (response.isSuccess()) {
-                recordResponseItems(response);
-                sendSuccessMessage();
-            } else {
-                sendFailedMessage(response.getMessage());
-            }
+            runTask();
         } catch (Exception ex) {
             Log.e(LOG_TAG, ex.getMessage(), ex);
             sendExceptionMessage(ex);
         }
-//        try {
-//            runTask();
-//        } catch (Exception ex) {
-//            Log.e(LOG_TAG, ex.getMessage(), ex);
-//            sendExceptionMessage(ex);
-//        }
     }
 
-    protected abstract Response runTask() throws IOException, TweeterRemoteException;
+    protected abstract void runTask() throws IOException, TweeterRemoteException;
 
-    protected abstract void recordResponseItems(Response response);
 
     protected FakeData getFakeData() {
         return FakeData.getInstance();

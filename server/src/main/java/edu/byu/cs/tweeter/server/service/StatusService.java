@@ -38,9 +38,10 @@ public class StatusService {
             throw new RuntimeException("[Bad Request] Request needs to have a target user");
         } else if (request.getLimit() <= 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
-        } else if (request.getLastStatus() == null) {
-            throw new RuntimeException("[Bad Request] Request needs to have a last status");
         }
+//        } else if (request.getLastStatus() == null) {
+//            throw new RuntimeException("[Bad Request] Request needs to have a last status");
+//        }
     }
 
     public StatusDAO getStatusDao() {

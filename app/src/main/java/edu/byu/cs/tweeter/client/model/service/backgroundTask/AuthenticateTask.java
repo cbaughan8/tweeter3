@@ -41,27 +41,21 @@ public abstract class AuthenticateTask extends BackgroundTask {
     }
 
     @Override
-    protected void recordResponseItems(AuthenticatedResponse response) {
-        authenticatedUser = response.getUser();
-        authToken = response.getAuthToken();
-    }
-
-    @Override
-    protected final AuthenticatedResponse runTask() throws IOException, TweeterRemoteException {
+    protected final void runTask() throws IOException, TweeterRemoteException {
 //        Pair<User, AuthToken> loginResult =
-        return runAuthenticationTask();
-//        try {
-//            if (response.isSuccess()) {
-//                authenticatedUser = response.getUser();
-//                authToken = response.getAuthToken();
-//                sendSuccessMessage();
-//            } else {
-//                sendFailedMessage(response.getMessage());
-//            }
-//        } catch (Exception ex) {
-//            Log.e(LOG_TAG, ex.getMessage(), ex);
-//            sendExceptionMessage(ex);
-//        }
+        AuthenticatedResponse response = runAuthenticationTask();
+        try {
+            if (response.isSuccess()) {
+                authenticatedUser = response.getUser();
+                authToken = response.getAuthToken();
+                sendSuccessMessage();
+            } else {
+                sendFailedMessage(response.getMessage());
+            }
+        } catch (Exception ex) {
+            Log.e(LOG_TAG, ex.getMessage(), ex);
+            sendExceptionMessage(ex);
+        }
 
 //        authenticatedUser = loginResult.getFirst();
 //        authToken = loginResult.getSecond();

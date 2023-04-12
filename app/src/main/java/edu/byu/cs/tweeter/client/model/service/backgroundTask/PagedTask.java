@@ -2,6 +2,7 @@ package edu.byu.cs.tweeter.client.model.service.backgroundTask;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,12 +10,17 @@ import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.response.PagedResponse;
+import edu.byu.cs.tweeter.model.net.response.Response;
 import edu.byu.cs.tweeter.util.Pair;
 
 public abstract class PagedTask<T> extends AuthenticatedTask {
 
     public static final String ITEMS_KEY = "items";
     public static final String MORE_PAGES_KEY = "more-pages";
+
+    protected static final String LOG_TAG = "PagedTask";
 
     /**
      * The user whose items are being retrieved.
@@ -64,19 +70,29 @@ public abstract class PagedTask<T> extends AuthenticatedTask {
     }
 
     @Override
-    protected final void runTask() throws IOException {
-        Pair<List<T>, Boolean> pageOfItems = getItems();
+    protected final void runTask() throws IOException, TweeterRemoteException {
+//        Pair<List<T>, Boolean> pageOfItems = getItems();
+//        items = pageOfItems.getFirst();
+//        hasMorePages = pageOfItems.getSecond();
 
-        items = pageOfItems.getFirst();
-        hasMorePages = pageOfItems.getSecond();
+        getItems();
+
 
         // Call sendSuccessMessage if successful
-        sendSuccessMessage();
+//        sendSuccessMessage();
         // or call sendFailedMessage if not successful
         // sendFailedMessage()
     }
 
-    protected abstract Pair<List<T>, Boolean> getItems();
+    protected abstract void getItems() throws IOException, TweeterRemoteException;
+
+    public void setItems(List<T> items) {
+        this.items = items;
+    }
+
+    public void setHasMorePages(boolean hasMorePages) {
+        this.hasMorePages = hasMorePages;
+    }
 
     protected abstract List<User> getUsersForItems(List<T> items);
 
