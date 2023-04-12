@@ -21,19 +21,14 @@ public class StatusDAO {
     }
 
     public FeedResponse getFeed(FeedRequest request) {
-        boolean hasMorePages = false;
-        Pair<List<Status>, Boolean> dummyData = getDummyStatuses(request, hasMorePages);
-        List<Status> responseFeed = dummyData.getFirst();
-        hasMorePages = dummyData.getSecond();
-        return new FeedResponse(responseFeed, hasMorePages);
+        Pair<List<Status>, Boolean> dummyData = getFakeData().getPageOfStatus(request.getLastStatus(), request.getLimit());
+        return new FeedResponse(dummyData.getFirst(), dummyData.getSecond());
     }
 
     public StoryResponse getStory(StoryRequest request) {
-        boolean hasMorePages = false;
-        Pair<List<Status>, Boolean> dummyData = getDummyStatuses(request, hasMorePages);
-        List<Status> responseStory = dummyData.getFirst();
-        hasMorePages = dummyData.getSecond();
-        return new StoryResponse(responseStory, hasMorePages);
+        System.out.println("lastStatus" + request.lastStatus);
+        Pair<List<Status>, Boolean> dummyData = getFakeData().getPageOfStatus(request.getLastStatus(), request.getLimit());
+        return new StoryResponse(dummyData.getFirst(), dummyData.getSecond());
     }
 
     private int getStartingIndex(Status lastStatus, List<Status> allStatuses) {
