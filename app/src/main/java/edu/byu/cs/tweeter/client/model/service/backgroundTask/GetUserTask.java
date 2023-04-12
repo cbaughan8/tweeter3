@@ -52,9 +52,6 @@ public class GetUserTask extends AuthenticatedTask {
             Log.e(LOG_TAG, ex.getMessage(), ex);
             sendExceptionMessage(ex);
         }
-
-
-
     }
 
     @Override
