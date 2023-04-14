@@ -26,9 +26,6 @@ class StatusServiceTest {
 
     @Test
     void loadMoreItemsStory() throws InterruptedException {
-//        Cache mockCache = Mockito.mock(Cache.class);
-//        when(mockCache.getCurrUserAuthToken()).thenReturn(new AuthToken());
-//        Cache.setInstance(mockCache);
         mockUser = new User("Carson", "Baughan", "@cb", "image");
         StoryObserver observer = Mockito.spy(new StoryObserver());
         StatusService statusService = Mockito.spy(new StatusService());

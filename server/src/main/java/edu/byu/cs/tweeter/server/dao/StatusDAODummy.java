@@ -13,7 +13,7 @@ import edu.byu.cs.tweeter.model.net.response.StoryResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
-public class StatusDAODynamo {
+public class StatusDAODummy {
     public PostStatusResponse postStatus() {
         return new PostStatusResponse();
     }

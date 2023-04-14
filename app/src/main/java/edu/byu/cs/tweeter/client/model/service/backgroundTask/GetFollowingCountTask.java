@@ -26,6 +26,5 @@ public class GetFollowingCountTask extends GetCountTask {
     protected FollowingCountResponse runCountTask() throws IOException, TweeterRemoteException {
         FollowingCountRequest request = new FollowingCountRequest(authToken, getTargetUser());
         return getServerFacade().getFollowingCount(request, URL_PATH);
-//        return 20;
     }
 }

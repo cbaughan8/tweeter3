@@ -11,13 +11,13 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
-import edu.byu.cs.tweeter.server.dao.FollowDAODynamo;
+import edu.byu.cs.tweeter.server.dao.FollowDAODummy;
 
 public class FollowServiceTest {
 
     private FollowingRequest request;
     private FollowingResponse expectedResponse;
-    private FollowDAODynamo mockFollowDAODynamo;
+    private FollowDAODummy mockFollowDAODummy;
     private FollowService followServiceSpy;
 
     @BeforeEach
@@ -38,16 +38,16 @@ public class FollowServiceTest {
 
         // Setup a mock FollowDAO that will return known responses
         expectedResponse = new FollowingResponse(Arrays.asList(resultUser1, resultUser2, resultUser3), false);
-        mockFollowDAODynamo = Mockito.mock(FollowDAODynamo.class);
-        Mockito.when(mockFollowDAODynamo.getFollowees(request)).thenReturn(expectedResponse);
+        mockFollowDAODummy = Mockito.mock(FollowDAODummy.class);
+        Mockito.when(mockFollowDAODummy.getFollowees(request)).thenReturn(expectedResponse);
 
         followServiceSpy = Mockito.spy(FollowService.class);
-        Mockito.when(followServiceSpy.getFollowingDAO()).thenReturn(mockFollowDAODynamo);
+        Mockito.when(followServiceSpy.getFollowingDAO()).thenReturn(mockFollowDAODummy);
     }
 
     /**
      * Verify that the {@link FollowService#getFollowees(FollowingRequest)}
-     * method returns the same result as the {@link FollowDAODynamo} class.
+     * method returns the same result as the {@link FollowDAODummy} class.
      */
     @Test
     public void testGetFollowees_validRequest_correctResponse() {

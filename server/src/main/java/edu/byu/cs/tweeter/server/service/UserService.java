@@ -10,7 +10,7 @@ import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
-import edu.byu.cs.tweeter.server.dao.UserDAODynamo;
+import edu.byu.cs.tweeter.server.dao.UserDAODummy;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public class UserService {
@@ -95,8 +95,8 @@ public class UserService {
         return FakeData.getInstance();
     }
 
-    UserDAODynamo getUserDAO() {
-        return new UserDAODynamo();
+    UserDAODummy getUserDAO() {
+        return new UserDAODummy();
     }
 
 }

@@ -7,7 +7,7 @@ import edu.byu.cs.tweeter.model.net.request.StoryRequest;
 import edu.byu.cs.tweeter.model.net.response.FeedResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.StoryResponse;
-import edu.byu.cs.tweeter.server.dao.StatusDAODynamo;
+import edu.byu.cs.tweeter.server.dao.StatusDAODummy;
 
 public class StatusService {
 
@@ -17,8 +17,8 @@ public class StatusService {
         } else if (request.getStatus() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         }
-        StatusDAODynamo statusDAODynamo = new StatusDAODynamo();
-        return statusDAODynamo.postStatus();
+        StatusDAODummy statusDAODummy = new StatusDAODummy();
+        return statusDAODummy.postStatus();
     }
 
     public FeedResponse getFeed(FeedRequest request) {
@@ -46,8 +46,8 @@ public class StatusService {
         // when deleted the feed appears twice
     }
 
-    public StatusDAODynamo getStatusDao() {
-        return new StatusDAODynamo();
+    public StatusDAODummy getStatusDao() {
+        return new StatusDAODummy();
     }
 
 
