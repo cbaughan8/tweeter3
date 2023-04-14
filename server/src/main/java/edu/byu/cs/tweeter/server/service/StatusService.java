@@ -7,7 +7,7 @@ import edu.byu.cs.tweeter.model.net.request.StoryRequest;
 import edu.byu.cs.tweeter.model.net.response.FeedResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.StoryResponse;
-import edu.byu.cs.tweeter.server.dao.StatusDAO;
+import edu.byu.cs.tweeter.server.dao.StatusDAODynamo;
 
 public class StatusService {
 
@@ -17,8 +17,8 @@ public class StatusService {
         } else if (request.getStatus() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         }
-        StatusDAO statusDAO = new StatusDAO();
-        return statusDAO.postStatus();
+        StatusDAODynamo statusDAODynamo = new StatusDAODynamo();
+        return statusDAODynamo.postStatus();
     }
 
     public FeedResponse getFeed(FeedRequest request) {
@@ -32,9 +32,10 @@ public class StatusService {
     }
 
     public void statusesCheck(PagedStatusRequest request) {
-        if (request.getAuthToken() == null) {
-            throw new RuntimeException("[Bad Request] Request needs to have an authToken");
-        } else if (request.getTargetUser() == null) {
+//        if (request.getAuthToken() == null) {
+//            throw new RuntimeException("[Bad Request] Request needs to have an authToken");
+//        } else
+        if (request.getTargetUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a target user");
         } else if (request.getLimit() < 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
@@ -45,8 +46,8 @@ public class StatusService {
         // when deleted the feed appears twice
     }
 
-    public StatusDAO getStatusDao() {
-        return new StatusDAO();
+    public StatusDAODynamo getStatusDao() {
+        return new StatusDAODynamo();
     }
 
 
