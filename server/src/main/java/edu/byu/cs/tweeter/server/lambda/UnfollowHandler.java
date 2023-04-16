@@ -7,10 +7,10 @@ import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 import edu.byu.cs.tweeter.server.service.FollowService;
 
-public class UnfollowHandler implements RequestHandler<UnfollowRequest, UnfollowResponse> {
+public class UnfollowHandler extends Handler implements RequestHandler<UnfollowRequest, UnfollowResponse> {
     @Override
     public UnfollowResponse handleRequest(UnfollowRequest request, Context context) {
-        FollowService followService = new FollowService();
+        FollowService followService = new FollowService(getFollowDao());
         return followService.unfollow(request);
     }
 }

@@ -1,5 +1,9 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.List;
+import java.util.Random;
+
+import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.CountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
@@ -15,12 +19,21 @@ import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
+import edu.byu.cs.tweeter.server.dao.FollowDAO;
 import edu.byu.cs.tweeter.server.dao.FollowDAODummy;
+import edu.byu.cs.tweeter.util.FakeData;
+import edu.byu.cs.tweeter.util.Pair;
 
 /**
  * Contains the business logic for getting the users a user is following.
  */
 public class FollowService {
+
+    FollowDAO followDAO;
+
+    public FollowService(FollowDAO followDAO) {
+        this.followDAO = followDAO;
+    }
 
     /**
      * Returns the users that the user specified in the request is following. Uses information in
@@ -37,7 +50,15 @@ public class FollowService {
         } else if (request.getLimit() <= 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
         }
-        return getFollowingDAO().getFollowees(request);
+
+        assert request.getLimit() > 0;
+        assert request.getFollowerAlias() != null;
+        User follower = getFakeData().findUserByAlias(request.getFollowerAlias());
+        User lastFollowee = getFakeData().findUserByAlias(request.getLastFolloweeAlias());
+
+        Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollowee, request.getLimit(), follower);
+        return new FollowingResponse(data.getFirst(), data.getSecond());
+//        return getFollowingDAO().getFollowing(request);
     }
 
     public FollowersResponse getFollowers(FollowersRequest request) {
@@ -46,7 +67,15 @@ public class FollowService {
         } else if (request.getLimit() <= 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
         }
-        return getFollowingDAO().getFollowers(request);
+
+        assert request.getLimit() > 0;
+        assert request.getFolloweeAlias() != null;
+        User followee = getFakeData().findUserByAlias(request.getFolloweeAlias());
+        User lastFollower = getFakeData().findUserByAlias(request.getLastFollowerAlias());
+
+        Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollower, request.getLimit(), followee);
+        return new FollowersResponse(data.getFirst(), data.getSecond());
+//        return getFollowingDAO().getFollowers(request);
     }
 
     public FollowResponse follow(FollowRequest request) {
@@ -55,7 +84,8 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
-        return getFollowingDAO().follow();
+        return new FollowResponse();
+//        return getFollowingDAO().follow(request);
     }
 
     public UnfollowResponse unfollow(UnfollowRequest request) {
@@ -64,7 +94,8 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
-        return getFollowingDAO().unfollow();
+        return new UnfollowResponse();
+//        return getFollowingDAO().unfollow(request);
     }
 
     public IsFollowerResponse isFollower(IsFollowerRequest request) {
@@ -75,19 +106,20 @@ public class FollowService {
         } else if (request.getAuthToken() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         }
-        return getFollowingDAO().isFollower();
+        return new IsFollowerResponse(new Random().nextInt() > 0);
+//        return getFollowingDAO().isFollower(request);
     }
 
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
-        FollowDAODummy followDAODummy = new FollowDAODummy();
-        return followDAODummy.getFollowersCount(request);
+        return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
+//        return followDAODummy.getFollowersCount(request);
     }
 
     public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
         getCountCheck(request);
-        FollowDAODummy followDAODummy = new FollowDAODummy();
-        return followDAODummy.getFollowingCount(request);
+        return new FollowingCountResponse(getFolloweeCount(request.getTargetUser()));
+//        return followDAODummy.getFollowingCount(request);
     }
 
     private void getCountCheck(CountRequest request) {
@@ -98,16 +130,45 @@ public class FollowService {
         }
     }
 
+    private int getStartingIndex(String lastPersonAlias, List<User> allPeople) {
+        int followeesIndex = 0;
+
+        if(lastPersonAlias != null) {
+            // This is a paged request for something after the first page. Find the first item
+            // we should return
+            for (int i = 0; i < allPeople.size(); i++) {
+                if(lastPersonAlias.equals(allPeople.get(i).getAlias())) {
+                    // We found the index of the last item returned last time. Increment to get
+                    // to the first one we should return
+                    followeesIndex = i + 1;
+                    break;
+                }
+            }
+        }
+
+        return followeesIndex;
+    }
 
     /**
-     * Returns an instance of {@link FollowDAODummy}. Allows mocking of the FollowDAO class
-     * for testing purposes. All usages of FollowDAO should get their FollowDAO
-     * instance from this method to allow for mocking of the instance.
+     * Gets the count of users from the database that the user specified is following. The
+     * current implementation uses generated data and doesn't actually access a database.
      *
-     * @return the instance.
+     * @param follower the User whose count of how many following is desired.
+     * @return said count.
      */
-    FollowDAODummy getFollowingDAO() {
-        return new FollowDAODummy();
+    public Integer getFolloweeCount(User follower) {
+        // TODO: uses the dummy data.  Replace with a real implementation.
+        // Includes user at the moment
+        assert follower != null;
+        // -1 for the user
+        return 20;
+    }
+
+    FakeData getFakeData() {
+        return FakeData.getInstance();
+    }
+    FollowDAO getFollowingDAO() {
+        return followDAO;
     }
 
 }

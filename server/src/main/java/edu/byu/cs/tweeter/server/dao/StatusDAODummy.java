@@ -6,6 +6,7 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.net.request.FeedRequest;
 import edu.byu.cs.tweeter.model.net.request.PagedStatusRequest;
+import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.StoryRequest;
 import edu.byu.cs.tweeter.model.net.response.FeedResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
@@ -13,8 +14,8 @@ import edu.byu.cs.tweeter.model.net.response.StoryResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
-public class StatusDAODummy {
-    public PostStatusResponse postStatus() {
+public class StatusDAODummy implements StatusDAO {
+    public PostStatusResponse postStatus(PostStatusRequest request) {
         return new PostStatusResponse();
     }
 
@@ -24,7 +25,6 @@ public class StatusDAODummy {
     }
 
     public StoryResponse getStory(StoryRequest request) {
-        System.out.println("lastStatus" + request.lastStatus);
         Pair<List<Status>, Boolean> dummyData = getFakeData().getPageOfStatus(request.getLastStatus(), request.getLimit());
         return new StoryResponse(dummyData.getFirst(), dummyData.getSecond());
     }

@@ -3,6 +3,8 @@ package edu.byu.cs.tweeter.server.dao;
 import java.util.HashMap;
 import java.util.Map;
 
+import edu.byu.cs.tweeter.server.dao.domain.DataPage;
+import edu.byu.cs.tweeter.server.dao.domain.Follows;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
@@ -27,7 +29,7 @@ import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-public class FollowDAODynamo {
+public class FollowDAODynamo  {
 
     private static final String TableName = "follows";
     public static final String IndexName = "follows_index";
@@ -54,7 +56,7 @@ public class FollowDAODynamo {
     public static void putItemInTable(String followersHandleVal,
                                       String followerNameVal,
                                       String followeesHandleVal,
-                                      String followeeNameVal){
+                                      String followeeNameVal) {
 
         HashMap<String, AttributeValue> itemValues = new HashMap<>();
         itemValues.put(followerHandle, AttributeValue.builder().s(followersHandleVal).build());

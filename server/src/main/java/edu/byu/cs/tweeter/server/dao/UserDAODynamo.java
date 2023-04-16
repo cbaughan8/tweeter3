@@ -10,7 +10,9 @@ import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 
-public class UserDAODummy implements UserDAO {
+public class UserDAODynamo implements UserDAO {
+    private static final String TableName = "authTokens";
+
     public LogoutResponse logout(LogoutRequest request) {
         return new LogoutResponse();
     }

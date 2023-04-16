@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.server.dao;
 
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingCountRequest;
@@ -15,11 +16,11 @@ import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
 
 public interface FollowDAO {
-    public FollowingResponse getFollowing(FollowingRequest request);
-    public FollowersResponse getFollowers(FollowersRequest request);
-    public FollowingCountResponse getFollowingCount(FollowingCountRequest request);
-    public FollowersCountResponse getFollowersCount(FollowersCountRequest request);
-    public FollowResponse follow(FollowResponse request);
-    public UnfollowResponse unfollow(UnfollowRequest request);
-    public IsFollowerResponse isFollower(IsFollowerRequest request);
+//    public FollowingResponse getFollowing(FollowingRequest request);
+//    public FollowersResponse getFollowers(FollowersRequest request);
+//    public FollowingCountResponse getFollowingCount(FollowingCountRequest request);
+//    public FollowersCountResponse getFollowersCount(FollowersCountRequest request);
+//    public FollowResponse follow(FollowRequest request);
+//    public UnfollowResponse unfollow(UnfollowRequest request);
+//    public IsFollowerResponse isFollower(IsFollowerRequest request);
 }

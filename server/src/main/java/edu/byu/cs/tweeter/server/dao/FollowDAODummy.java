@@ -4,10 +4,13 @@ import java.util.List;
 import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
+import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersResponse;
@@ -21,7 +24,7 @@ import edu.byu.cs.tweeter.util.Pair;
 /**
  * A DAO for accessing 'following' data from the database.
  */
-public class FollowDAODummy {
+public class FollowDAODummy implements FollowDAO {
 
     /**
      * Gets the count of users from the database that the user specified is following. The
@@ -48,7 +51,7 @@ public class FollowDAODummy {
      *                other information required to satisfy the request.
      * @return the followees.
      */
-    public FollowingResponse getFollowees(FollowingRequest request) {
+    public FollowingResponse getFollowing(FollowingRequest request) {
         // TODO: Generates dummy data. Replace with a real implementation.
         assert request.getLimit() > 0;
         assert request.getFollowerAlias() != null;
@@ -103,14 +106,14 @@ public class FollowDAODummy {
     }
 
     //TODO: Make real functionality
-    public FollowResponse follow() {
+    public FollowResponse follow(FollowRequest request) {
         return new FollowResponse();
     }
-    public UnfollowResponse unfollow() {
+    public UnfollowResponse unfollow(UnfollowRequest request) {
         return new UnfollowResponse();
     }
 
-    public IsFollowerResponse isFollower() {
+    public IsFollowerResponse isFollower(IsFollowerRequest request) {
         return new IsFollowerResponse(new Random().nextInt() > 0);
     }
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {

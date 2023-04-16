@@ -39,7 +39,7 @@ public class FollowServiceTest {
         // Setup a mock FollowDAO that will return known responses
         expectedResponse = new FollowingResponse(Arrays.asList(resultUser1, resultUser2, resultUser3), false);
         mockFollowDAODummy = Mockito.mock(FollowDAODummy.class);
-        Mockito.when(mockFollowDAODummy.getFollowees(request)).thenReturn(expectedResponse);
+        Mockito.when(mockFollowDAODummy.getFollowing(request)).thenReturn(expectedResponse);
 
         followServiceSpy = Mockito.spy(FollowService.class);
         Mockito.when(followServiceSpy.getFollowingDAO()).thenReturn(mockFollowDAODummy);

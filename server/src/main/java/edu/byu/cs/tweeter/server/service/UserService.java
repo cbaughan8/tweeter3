@@ -10,10 +10,24 @@ import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
+import edu.byu.cs.tweeter.server.dao.ImageDAO;
+import edu.byu.cs.tweeter.server.dao.UserDAO;
 import edu.byu.cs.tweeter.server.dao.UserDAODummy;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public class UserService {
+
+    UserDAO userDAO;
+    ImageDAO imageDAO;
+
+    public UserService(UserDAO userDAO) {
+        this.userDAO = userDAO;
+    }
+
+    public UserService(UserDAO userDAO, ImageDAO imageDAO) {
+        this.userDAO = userDAO;
+        this.imageDAO = imageDAO;
+    }
 
     public LoginResponse login(LoginRequest request) {
         if(request.getUsername() == null){
@@ -44,6 +58,7 @@ public class UserService {
         // TODO: Generates dummy data. Replace with a real implementation.
         User user = getDummyUser();
         AuthToken authToken = getDummyAuthToken();
+        getImageDAO().addImage(request.getImageBytesBase64(), request.getUsername());
         return new RegisterResponse(user, authToken);
     }
 
@@ -95,8 +110,11 @@ public class UserService {
         return FakeData.getInstance();
     }
 
-    UserDAODummy getUserDAO() {
-        return new UserDAODummy();
+    UserDAO getUserDAO() {
+        return userDAO;
     }
 
+    public ImageDAO getImageDAO() {
+        return imageDAO;
+    }
 }
