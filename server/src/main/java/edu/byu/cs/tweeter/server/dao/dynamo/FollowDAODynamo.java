@@ -1,10 +1,11 @@
-package edu.byu.cs.tweeter.server.dao;
+package edu.byu.cs.tweeter.server.dao.dynamo;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import edu.byu.cs.tweeter.server.dao.domain.DataPage;
-import edu.byu.cs.tweeter.server.dao.domain.Follows;
+import edu.byu.cs.tweeter.server.dao.beans.DataPage;
+import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
+import edu.byu.cs.tweeter.server.dao.interfaces.FollowDAO;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
@@ -29,7 +30,7 @@ import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-public class FollowDAODynamo  {
+public class FollowDAODynamo implements FollowDAO {
 
     private static final String TableName = "follows";
     public static final String IndexName = "follows_index";
@@ -53,7 +54,7 @@ public class FollowDAODynamo  {
         return (value != null && value.length() > 0);
     }
 
-    public static void putItemInTable(String followersHandleVal,
+    public void putItemInTable(String followersHandleVal,
                                       String followerNameVal,
                                       String followeesHandleVal,
                                       String followeeNameVal) {
@@ -83,7 +84,7 @@ public class FollowDAODynamo  {
         }
     }
 
-    public static void deleteDynamoDBItem(String followerHandleVal, String followeeHandleVal) {
+    public void deleteDynamoDBItem(String followerHandleVal, String followeeHandleVal) {
         HashMap<String,AttributeValue> keyToGet = new HashMap<>();
         keyToGet.put(followerHandle, AttributeValue.builder()
                 .s(followerHandleVal)
@@ -182,8 +183,8 @@ public class FollowDAODynamo  {
         System.out.println("The Amazon DynamoDB table was updated!");
     }
 
-    public DataPage<Follows> getPageOfFollowees(String targetUserAlias, int pageSize, String lastUserAlias ) {
-        DynamoDbTable<Follows> table = enhancedClient.table(TableName, TableSchema.fromBean(Follows.class));
+    public DataPage<FollowsBean> getPageOfFollowees(String targetUserAlias, int pageSize, String lastUserAlias ) {
+        DynamoDbTable<FollowsBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class));
         Key key = Key.builder()
                 .partitionValue(targetUserAlias)
                 .build();
@@ -203,12 +204,12 @@ public class FollowDAODynamo  {
 
         QueryEnhancedRequest request = requestBuilder.build();
 
-        DataPage<Follows> result = new DataPage<Follows>();
+        DataPage<FollowsBean> result = new DataPage<FollowsBean>();
 
-        PageIterable<Follows> pages = table.query(request);
+        PageIterable<FollowsBean> pages = table.query(request);
         pages.stream()
                 .limit(1)
-                .forEach((Page<Follows> page) -> {
+                .forEach((Page<FollowsBean> page) -> {
                     result.setHasMorePages(page.lastEvaluatedKey() != null);
                     page.items().forEach(visit -> result.getValues().add(visit));
                 });
@@ -216,8 +217,8 @@ public class FollowDAODynamo  {
         return result;
     }
 
-    public DataPage<Follows> getPageOfFollowers(String targetUserAlias, int pageSize, String lastUserAlias ) {
-        DynamoDbIndex<Follows> index = enhancedClient.table(TableName, TableSchema.fromBean(Follows.class)).index(IndexName);
+    public DataPage<FollowsBean> getPageOfFollowers(String targetUserAlias, int pageSize, String lastUserAlias ) {
+        DynamoDbIndex<FollowsBean> index = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class)).index(IndexName);
         Key key = Key.builder()
                 .partitionValue(targetUserAlias)
                 .build();
@@ -237,13 +238,13 @@ public class FollowDAODynamo  {
 
         QueryEnhancedRequest request = requestBuilder.build();
 
-        DataPage<Follows> result = new DataPage<Follows>();
+        DataPage<FollowsBean> result = new DataPage<FollowsBean>();
 
-        SdkIterable<Page<Follows>> sdkIterable = index.query(request);
-        PageIterable<Follows> pages = PageIterable.create(sdkIterable);
+        SdkIterable<Page<FollowsBean>> sdkIterable = index.query(request);
+        PageIterable<FollowsBean> pages = PageIterable.create(sdkIterable);
         pages.stream()
                 .limit(1)
-                .forEach((Page<Follows> page) -> {
+                .forEach((Page<FollowsBean> page) -> {
                     result.setHasMorePages(page.lastEvaluatedKey() != null);
                     page.items().forEach(visit -> result.getValues().add(visit));
                 });

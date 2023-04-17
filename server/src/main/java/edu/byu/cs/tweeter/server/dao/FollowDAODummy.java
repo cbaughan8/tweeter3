@@ -18,6 +18,9 @@ import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
+import edu.byu.cs.tweeter.server.dao.beans.DataPage;
+import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
+import edu.byu.cs.tweeter.server.dao.interfaces.FollowDAO;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -145,5 +148,23 @@ public class FollowDAODummy implements FollowDAO {
     }
 
 
+    @Override
+    public DataPage<FollowsBean> getPageOfFollowers(String targetUserAlias, int limit, String lastUserAlias) {
+        return null;
+    }
 
+    @Override
+    public DataPage<FollowsBean> getPageOfFollowees(String targetUserAlias, int limit, String lastUserAlias) {
+        return null;
+    }
+
+    @Override
+    public void deleteDynamoDBItem(String followerHandleVal, String followeeHandleVal) {
+
+    }
+
+    @Override
+    public void putItemInTable(String followersHandleVal, String followerNameVal, String followeesHandleVal, String followeeNameVal) {
+
+    }
 }

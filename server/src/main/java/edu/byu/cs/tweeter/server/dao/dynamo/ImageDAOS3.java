@@ -1,4 +1,4 @@
-package edu.byu.cs.tweeter.server.dao;
+package edu.byu.cs.tweeter.server.dao.dynamo;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
@@ -8,6 +8,8 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
+
+import edu.byu.cs.tweeter.server.dao.interfaces.ImageDAO;
 
 public class ImageDAOS3 implements ImageDAO {
 
@@ -19,7 +21,7 @@ public class ImageDAOS3 implements ImageDAO {
             .withRegion(REGION_NAME)
             .build();
 
-    public void addImage(String image_string, String alias) {
+    public String addImage(String image_string, String alias) {
         byte[] byteArray = Base64.getDecoder().decode(image_string);
         ObjectMetadata data = new ObjectMetadata();
         data.setContentLength(byteArray.length);
@@ -29,6 +31,6 @@ public class ImageDAOS3 implements ImageDAO {
 
         s3.putObject(request);
 
-        String link = "https://" + BUCKET_NAME + ".s3." + REGION_NAME + ".amazonaws.com/ " + alias;
+        return "https://" + BUCKET_NAME + ".s3." + REGION_NAME + ".amazonaws.com/ " + alias;
     }
 }

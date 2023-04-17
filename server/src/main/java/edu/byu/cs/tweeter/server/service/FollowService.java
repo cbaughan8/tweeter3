@@ -19,8 +19,11 @@ import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
-import edu.byu.cs.tweeter.server.dao.FollowDAO;
+import edu.byu.cs.tweeter.server.dao.beans.DataPage;
+import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
+import edu.byu.cs.tweeter.server.dao.interfaces.FollowDAO;
 import edu.byu.cs.tweeter.server.dao.FollowDAODummy;
+import edu.byu.cs.tweeter.server.dao.interfaces.UserDAO;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -31,8 +34,14 @@ public class FollowService {
 
     FollowDAO followDAO;
 
+    UserDAO userDAO;
+
     public FollowService(FollowDAO followDAO) {
         this.followDAO = followDAO;
+    }
+
+    public FollowService(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     /**
@@ -56,6 +65,13 @@ public class FollowService {
         User follower = getFakeData().findUserByAlias(request.getFollowerAlias());
         User lastFollowee = getFakeData().findUserByAlias(request.getLastFolloweeAlias());
 
+        DataPage<FollowsBean> dataPage = getFollowDAO().getPageOfFollowees(request.getFollowerAlias(),
+                request.getLimit(), request.getLastFolloweeAlias());
+
+        System.out.println("FOLLOWEES!");
+        System.out.println("DATAPAGE VALUES:");
+        System.out.println(dataPage.getValues());
+
         Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollowee, request.getLimit(), follower);
         return new FollowingResponse(data.getFirst(), data.getSecond());
 //        return getFollowingDAO().getFollowing(request);
@@ -70,6 +86,15 @@ public class FollowService {
 
         assert request.getLimit() > 0;
         assert request.getFolloweeAlias() != null;
+
+        DataPage<FollowsBean> dataPage = getFollowDAO().getPageOfFollowers(request.getFolloweeAlias(),
+                request.getLimit(), request.getLastFollowerAlias());
+
+
+        System.out.println("FOLLOWERS!");
+        System.out.println("DATAPAGE VALUES:");
+        System.out.println(dataPage.getValues());
+
         User followee = getFakeData().findUserByAlias(request.getFolloweeAlias());
         User lastFollower = getFakeData().findUserByAlias(request.getLastFollowerAlias());
 
@@ -84,6 +109,10 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
+        // use authToken to get followee and request.getSelectedUser() for follower
+        // pull names from user table
+//        getFollowDAO().putItemInTable();
+
         return new FollowResponse();
 //        return getFollowingDAO().follow(request);
     }
@@ -94,6 +123,9 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
+        // use authToken to get followee and request.getSelectedUser() for follower
+//        getFollowDAO().deleteDynamoDBItem(request.getSelectedUser());
+
         return new UnfollowResponse();
 //        return getFollowingDAO().unfollow(request);
     }
@@ -112,12 +144,19 @@ public class FollowService {
 
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
+
+        // getUser and pull following count from that
+
+
         return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
 //        return followDAODummy.getFollowersCount(request);
     }
 
     public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
         getCountCheck(request);
+
+        // getUser and pull following count from that
+
         return new FollowingCountResponse(getFolloweeCount(request.getTargetUser()));
 //        return followDAODummy.getFollowingCount(request);
     }
@@ -167,8 +206,12 @@ public class FollowService {
     FakeData getFakeData() {
         return FakeData.getInstance();
     }
-    FollowDAO getFollowingDAO() {
+    FollowDAO getFollowDAO() {
         return followDAO;
+    }
+
+    UserDAO getUserDAO() {
+        return userDAO;
     }
 
 }

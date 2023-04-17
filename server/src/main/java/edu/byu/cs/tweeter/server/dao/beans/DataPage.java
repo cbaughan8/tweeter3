@@ -1,4 +1,4 @@
-package edu.byu.cs.tweeter.server.dao.domain;
+package edu.byu.cs.tweeter.server.dao.beans;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,9 +8,11 @@ import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.LoginResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.RegisterResponse;
+import edu.byu.cs.tweeter.server.dao.beans.UserBean;
+import edu.byu.cs.tweeter.server.dao.interfaces.UserDAO;
 import edu.byu.cs.tweeter.util.FakeData;
 
-public class UserDAODummy implements UserDAO {
+public class UserDAODummy{
     public LogoutResponse logout(LogoutRequest request) {
         return new LogoutResponse();
     }
@@ -38,4 +40,5 @@ public class UserDAODummy implements UserDAO {
     FakeData getFakeData() {
         return FakeData.getInstance();
     }
+
 }

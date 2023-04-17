@@ -1,4 +1,4 @@
-package edu.byu.cs.tweeter.server.dao.domain;
+package edu.byu.cs.tweeter.server.dao.beans;
 
 
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
@@ -6,10 +6,17 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbParti
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 @DynamoDbBean
-public class AuthToken {
+public class AuthTokenBean {
     String authToken;
     long timestamp;
-    String alias;
+
+    public AuthTokenBean() {
+    }
+
+    public AuthTokenBean(String authToken, long timestamp) {
+        this.authToken = authToken;
+        this.timestamp = timestamp;
+    }
 
     @DynamoDbPartitionKey
     public String getAuthToken() {
@@ -29,11 +36,11 @@ public class AuthToken {
         this.timestamp = timestamp;
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
-    public void setAlias(String alias) {
-        this.alias = alias;
+    @Override
+    public String toString() {
+        return "AuthToken{" +
+                "authToken='" + authToken + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
     }
 }

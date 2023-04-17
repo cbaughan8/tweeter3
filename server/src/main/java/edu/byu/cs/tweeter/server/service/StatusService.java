@@ -1,5 +1,8 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.List;
+
+import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.net.request.FeedRequest;
 import edu.byu.cs.tweeter.model.net.request.PagedStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
@@ -7,10 +10,11 @@ import edu.byu.cs.tweeter.model.net.request.StoryRequest;
 import edu.byu.cs.tweeter.model.net.response.FeedResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.StoryResponse;
-import edu.byu.cs.tweeter.server.dao.FeedDAO;
-import edu.byu.cs.tweeter.server.dao.StatusDAO;
+import edu.byu.cs.tweeter.server.dao.interfaces.FeedDAO;
 import edu.byu.cs.tweeter.server.dao.StatusDAODummy;
-import edu.byu.cs.tweeter.server.dao.StoryDAO;
+import edu.byu.cs.tweeter.server.dao.interfaces.StoryDAO;
+import edu.byu.cs.tweeter.util.FakeData;
+import edu.byu.cs.tweeter.util.Pair;
 
 public class StatusService {
     StoryDAO storyDAO = null;
@@ -41,7 +45,8 @@ public class StatusService {
 
     public FeedResponse getFeed(FeedRequest request) {
         statusesCheck(request);
-        return getFeedDAO().getFeed(request);
+        Pair<List<Status>, Boolean> dummyData = getFakeData().getPageOfStatus(request.getLastStatus(), request.getLimit());
+        return new FeedResponse(dummyData.getFirst(), dummyData.getSecond());
     }
 
     public StoryResponse getStory(StoryRequest request) {
@@ -64,6 +69,9 @@ public class StatusService {
         // when deleted the feed appears twice
     }
 
+    FakeData getFakeData() {
+        return FakeData.getInstance();
+    }
 
     public StoryDAO getStoryDAO() {
         return storyDAO;

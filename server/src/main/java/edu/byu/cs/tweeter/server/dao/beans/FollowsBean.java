@@ -1,6 +1,6 @@
-package edu.byu.cs.tweeter.server.dao.domain;
+package edu.byu.cs.tweeter.server.dao.beans;
 
-import edu.byu.cs.tweeter.server.dao.FollowDAODynamo;
+import edu.byu.cs.tweeter.server.dao.dynamo.FollowDAODynamo;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbPartitionKey;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecondaryPartitionKey;
@@ -8,12 +8,22 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSecon
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortKey;
 
 @DynamoDbBean
-public class Follows {
+public class FollowsBean {
     String follower_handle;
 
     String followee_handle;
     String follower_name;
     String followee_name;
+
+    public FollowsBean() {
+    }
+
+    public FollowsBean(String follower_handle, String followee_handle, String follower_name, String followee_name) {
+        this.follower_handle = follower_handle;
+        this.followee_handle = followee_handle;
+        this.follower_name = follower_name;
+        this.followee_name = followee_name;
+    }
 
     @DynamoDbPartitionKey
     @DynamoDbSecondarySortKey(indexNames = FollowDAODynamo.IndexName)
