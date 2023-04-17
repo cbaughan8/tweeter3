@@ -167,4 +167,14 @@ public class FollowDAODummy implements FollowDAO {
     public void putItemInTable(String followersHandleVal, String followerNameVal, String followeesHandleVal, String followeeNameVal) {
 
     }
+
+    @Override
+    public void create(FollowsBean followsBean) {
+
+    }
+
+    @Override
+    public void delete(FollowsBean followsBean) {
+
+    }
 }

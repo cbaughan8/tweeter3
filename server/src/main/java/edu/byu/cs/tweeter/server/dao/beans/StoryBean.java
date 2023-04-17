@@ -15,6 +15,17 @@ public class StoryBean {
     List<String> mentions;
     List<String> urls;
 
+    public StoryBean() {
+    }
+
+    public StoryBean(String alias, long timestamp, String post, List<String> mentions, List<String> urls) {
+        this.alias = alias;
+        this.timestamp = timestamp;
+        this.post = post;
+        this.mentions = mentions;
+        this.urls = urls;
+    }
+
     @DynamoDbPartitionKey
     public String getAlias() {
         return alias;

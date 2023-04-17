@@ -10,7 +10,7 @@ import edu.byu.cs.tweeter.server.service.FollowService;
 public class UnfollowHandler extends Handler implements RequestHandler<UnfollowRequest, UnfollowResponse> {
     @Override
     public UnfollowResponse handleRequest(UnfollowRequest request, Context context) {
-        FollowService followService = new FollowService(getFollowDao());
+        FollowService followService = new FollowService(getFollowDao(), getUserDao(), getAuthTokenDAO());
         return followService.unfollow(request);
     }
 }

@@ -49,6 +49,8 @@ public class FollowDAODynamo implements FollowDAO {
             .dynamoDbClient(dynamoDbClient)
             .build();
 
+    private static final DynamoDbTable<FollowsBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class));
+
 
     private static boolean isNonEmptyString(String value) {
         return (value != null && value.length() > 0);
@@ -252,7 +254,21 @@ public class FollowDAODynamo implements FollowDAO {
         return result;
     }
 
+    public void create(FollowsBean bean) {
+        try {
+            table.putItem(bean);
+        } catch (DynamoDbException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
+    public void delete(FollowsBean bean) {
+        Key key = Key.builder()
+                .partitionValue(bean.getFollower_handle())
+                .sortValue(bean.getFollowee_handle())
+                .build();
+        table.deleteItem(key);
+    }
 
 
 

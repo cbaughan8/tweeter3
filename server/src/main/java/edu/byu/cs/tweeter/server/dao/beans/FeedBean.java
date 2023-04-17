@@ -10,14 +10,35 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 @DynamoDbBean
 public class FeedBean {
 
-    String poster_alias;
-    String follower_alias;
+    String receiver_alias;
     long timestamp;
+
+    String poster_alias;
     String post;
     List<String> mentions;
     List<String> urls;
 
+    public FeedBean() {
+    }
+
+    public FeedBean(String receiver_alias, long timestamp, String poster_alias, String post, List<String> mentions, List<String> urls) {
+        this.receiver_alias = receiver_alias;
+        this.timestamp = timestamp;
+        this.poster_alias = poster_alias;
+        this.post = post;
+        this.mentions = mentions;
+        this.urls = urls;
+    }
+
     @DynamoDbPartitionKey
+    public String getReceiver_alias() {
+        return receiver_alias;
+    }
+
+    public void setReceiver_alias(String receiver_alias) {
+        this.receiver_alias = receiver_alias;
+    }
+
     public String getPoster_alias() {
         return poster_alias;
     }
@@ -63,7 +84,7 @@ public class FeedBean {
     public String toString() {
         return "Feed{" +
                 "poster_alias='" + poster_alias + '\'' +
-                ", follower_alias='" + follower_alias + '\'' +
+                ", receiver_alias='" + receiver_alias + '\'' +
                 ", timestamp=" + timestamp +
                 ", post='" + post + '\'' +
                 ", mentions=" + mentions +

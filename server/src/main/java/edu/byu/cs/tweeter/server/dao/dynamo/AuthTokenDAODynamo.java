@@ -1,13 +1,10 @@
 package edu.byu.cs.tweeter.server.dao.dynamo;
 
-import java.util.HashMap;
-
 import edu.byu.cs.tweeter.server.dao.beans.AuthTokenBean;
 import edu.byu.cs.tweeter.server.dao.interfaces.AuthTokenDAO;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
-import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 public class AuthTokenDAODynamo extends DynamoDAO implements AuthTokenDAO {

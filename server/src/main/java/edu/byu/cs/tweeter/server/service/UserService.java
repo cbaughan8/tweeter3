@@ -12,6 +12,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Random;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -51,9 +52,10 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public UserService(UserDAO userDAO, ImageDAO imageDAO) {
+    public UserService(UserDAO userDAO, AuthTokenDAO authTokenDAO ,ImageDAO imageDAO) {
         this.userDAO = userDAO;
         this.imageDAO = imageDAO;
+        this.authTokenDAO = authTokenDAO;
     }
 
     public LoginResponse login(LoginRequest request) {
@@ -71,27 +73,16 @@ public class UserService {
             throw new RuntimeException("[Bad Request] Incorrect password");
         }
         long timestamp = System.currentTimeMillis();
+        AuthToken token = generateAuthToken(timestamp);
 
-        byte[] array = new byte[12]; // length is bounded by 7
-        String tokenString = new String(array, StandardCharsets.UTF_8);
-
-        Date date = new Date(timestamp);
-        String dateTime = String.valueOf(date.getTime()) + String.valueOf(date.getDate());
-        AuthToken token = new AuthToken(tokenString, dateTime);
-
-        AuthTokenBean authTokenBean = new AuthTokenBean(token.getToken(), timestamp);
+        AuthTokenBean authTokenBean = new AuthTokenBean(token.getToken(), timestamp, request.getUsername());
+        System.out.println(authTokenBean);
         getAuthTokenDAO().create(authTokenBean);
         return new LoginResponse(new User(userBean.getFirst_name(), userBean.getLast_name(),
                 userBean.getAlias(), userBean.getImage_url()), token);
-//        User user = getDummyUser();
-//        AuthToken authToken = getDummyAuthToken();
-//        return new LoginResponse(user, authToken);
     }
 
     private boolean validatePassword(String password, int password_hash, byte[] salt) {
-        System.out.println(password);
-        System.out.println(password_hash);
-        System.out.println(salt);
         int new_hash = hashPassword(password, salt);
         return new_hash == password_hash;
     }
@@ -109,23 +100,26 @@ public class UserService {
             throw new RuntimeException("[Bad Request] Missing an image");
         }
 
-        // TODO: Generates dummy data. Replace with a real implementation.
-        User user = getDummyUser();
-        AuthToken authToken = getDummyAuthToken();
-        // fix numbers later
-
         byte[] salt = getUniversal_salt();
         int hash = hashPassword(request.getPassword(), salt);
+        String url = getImageDAO().addImage(request.getImageBytesBase64(), request.getUsername());
 
         UserBean userBean = new UserBean(request.getUsername(), request.getFirstName(),
-                request.getLastName(), request.getImageBytesBase64(),
+                request.getLastName(), url,
                 hash, 0 ,0);
 
+        long timestamp = System.currentTimeMillis();
+        AuthToken token = generateAuthToken(timestamp);
+
+        AuthTokenBean authTokenBean = new AuthTokenBean(token.getToken(), timestamp, request.getUsername());
+        System.out.println(authTokenBean);
+        getAuthTokenDAO().create(authTokenBean);
+
         getUserDAO().create(userBean);
-        getImageDAO().addImage(request.getImageBytesBase64(), request.getUsername());
+        AuthToken authToken = generateAuthToken(System.currentTimeMillis());
+        User user = new User(request.getFirstName(), request.getLastName(),request.getUsername(), url);
         return new RegisterResponse(user, authToken);
     }
-
 
     //TODO: Check if logout deletes authtoken
     public LogoutResponse logout(LogoutRequest request) {
@@ -147,10 +141,8 @@ public class UserService {
             throw new RuntimeException("[Bad Request] Missing an alias");
         }
 
-
         UserBean userBean = getUserDAO().get(request.getAlias());
 
-//        User user = getFakeData().findUserByAlias(request.getAlias());
         return new GetUserResponse(new User(userBean.getFirst_name(),userBean.getLast_name(),
                 userBean.getAlias(), userBean.getImage_url()));
 
@@ -205,6 +197,15 @@ public class UserService {
             e.printStackTrace();
             throw new RuntimeException();
         }
+    }
+
+    AuthToken generateAuthToken(long timestamp){
+        byte[] array = new byte[12]; // length is bounded by 7
+        new Random().nextBytes(array);
+        String tokenString = new String(array, StandardCharsets.UTF_8);
+        Date date = new Date(timestamp);
+        String dateTime = String.valueOf(date.getTime()) + String.valueOf(date.getDate());
+        return new AuthToken(tokenString, dateTime);
     }
 
     public byte[] getUniversal_salt() {

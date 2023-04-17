@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.server.dao.interfaces;
 
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.server.dao.beans.DataPage;
 import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
 
@@ -11,6 +12,9 @@ public interface FollowDAO {
     public void putItemInTable(String followersHandleVal, String followerNameVal,
                                String followeesHandleVal,
                                String followeeNameVal);
+
+    public void create(FollowsBean followsBean);
+    public void delete(FollowsBean followsBean);
 //    public FollowingResponse getFollowing(FollowingRequest request);
 //    public FollowersResponse getFollowers(FollowersRequest request);
 //    public FollowingCountResponse getFollowingCount(FollowingCountRequest request);

@@ -14,7 +14,7 @@ import edu.byu.cs.tweeter.server.service.UserService;
 public class LoginHandler extends Handler implements RequestHandler<LoginRequest, LoginResponse> {
     @Override
     public LoginResponse handleRequest(LoginRequest loginRequest, Context context) {
-        UserService userService = new UserService(getUserDao(), getAuthTokenDAO());
+        UserService userService = new UserService(getUserDao(),getAuthTokenDAO(), getImageDao());
         return userService.login(loginRequest);
     }
 }

@@ -31,6 +31,6 @@ public class ImageDAOS3 implements ImageDAO {
 
         s3.putObject(request);
 
-        return "https://" + BUCKET_NAME + ".s3." + REGION_NAME + ".amazonaws.com/ " + alias;
+        return "https://" + BUCKET_NAME + ".s3." + REGION_NAME + ".amazonaws.com/" + alias;
     }
 }

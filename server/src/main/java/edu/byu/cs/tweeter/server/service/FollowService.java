@@ -19,10 +19,14 @@ import edu.byu.cs.tweeter.model.net.response.FollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.IsFollowerResponse;
 import edu.byu.cs.tweeter.model.net.response.UnfollowResponse;
+import edu.byu.cs.tweeter.server.dao.beans.AuthTokenBean;
 import edu.byu.cs.tweeter.server.dao.beans.DataPage;
 import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
+import edu.byu.cs.tweeter.server.dao.beans.UserBean;
+import edu.byu.cs.tweeter.server.dao.interfaces.AuthTokenDAO;
 import edu.byu.cs.tweeter.server.dao.interfaces.FollowDAO;
 import edu.byu.cs.tweeter.server.dao.FollowDAODummy;
+import edu.byu.cs.tweeter.server.dao.interfaces.ImageDAO;
 import edu.byu.cs.tweeter.server.dao.interfaces.UserDAO;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
@@ -35,6 +39,19 @@ public class FollowService {
     FollowDAO followDAO;
 
     UserDAO userDAO;
+
+    AuthTokenDAO authTokenDAO;
+
+    public FollowService(FollowDAO followDAO, UserDAO userDAO, AuthTokenDAO authTokenDAO) {
+        this.followDAO = followDAO;
+        this.userDAO = userDAO;
+        this.authTokenDAO = authTokenDAO;
+    }
+
+    public FollowService(UserDAO userDAO, FollowDAO followDAO) {
+        this.userDAO = userDAO;
+        this.followDAO = followDAO;
+    }
 
     public FollowService(FollowDAO followDAO) {
         this.followDAO = followDAO;
@@ -109,12 +126,15 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
-        // use authToken to get followee and request.getSelectedUser() for follower
-        // pull names from user table
-//        getFollowDAO().putItemInTable();
 
+        AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
+        UserBean selectedUserBean = getUserDAO().get(authTokenBean.getAlias());
+        UserBean followerUserBean = getUserDAO().get(request.getSelectedUser().getAlias());
+
+        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), selectedUserBean.getAlias(),
+                followerUserBean.getFirst_name(), selectedUserBean.getFirst_name());
+        getFollowDAO().create(bean);
         return new FollowResponse();
-//        return getFollowingDAO().follow(request);
     }
 
     public UnfollowResponse unfollow(UnfollowRequest request) {
@@ -123,11 +143,15 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
-        // use authToken to get followee and request.getSelectedUser() for follower
-//        getFollowDAO().deleteDynamoDBItem(request.getSelectedUser());
+        AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
+        UserBean selectedUserBean = getUserDAO().get(authTokenBean.getAlias());
+        UserBean followerUserBean = getUserDAO().get(request.getSelectedUser().getAlias());
+
+        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), selectedUserBean.getAlias(),
+                followerUserBean.getFirst_name(), selectedUserBean.getFirst_name());
+        getFollowDAO().delete(bean);
 
         return new UnfollowResponse();
-//        return getFollowingDAO().unfollow(request);
     }
 
     public IsFollowerResponse isFollower(IsFollowerRequest request) {
@@ -138,6 +162,8 @@ public class FollowService {
         } else if (request.getAuthToken() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         }
+
+
         return new IsFollowerResponse(new Random().nextInt() > 0);
 //        return getFollowingDAO().isFollower(request);
     }
@@ -214,6 +240,9 @@ public class FollowService {
         return userDAO;
     }
 
+    public AuthTokenDAO getAuthTokenDAO() {
+        return authTokenDAO;
+    }
 }
 
 

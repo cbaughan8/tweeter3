@@ -51,7 +51,9 @@ public class StatusService {
 
     public StoryResponse getStory(StoryRequest request) {
         statusesCheck(request);
-        return getStoryDAO().getStory(request);
+
+        Pair<List<Status>, Boolean> dummyData = getFakeData().getPageOfStatus(request.getLastStatus(), request.getLimit());
+        return new StoryResponse(dummyData.getFirst(), dummyData.getSecond());
     }
 
     public void statusesCheck(PagedStatusRequest request) {
@@ -68,6 +70,8 @@ public class StatusService {
 //        }
         // when deleted the feed appears twice
     }
+
+
 
     FakeData getFakeData() {
         return FakeData.getInstance();

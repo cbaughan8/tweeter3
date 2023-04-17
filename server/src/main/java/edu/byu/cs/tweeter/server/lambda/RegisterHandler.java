@@ -10,7 +10,7 @@ import edu.byu.cs.tweeter.server.service.UserService;
 public class RegisterHandler extends Handler implements RequestHandler<RegisterRequest, RegisterResponse> {
     @Override
     public RegisterResponse handleRequest(RegisterRequest registerRequest, Context context) {
-        UserService userService = new UserService(getUserDao(), getImageDao());
+        UserService userService = new UserService(getUserDao(), getAuthTokenDAO(),getImageDao());
         return userService.register(registerRequest);
     }
 }
