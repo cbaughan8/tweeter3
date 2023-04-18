@@ -100,6 +100,11 @@ public class UserService {
             throw new RuntimeException("[Bad Request] Missing an image");
         }
 
+        UserBean existingUser = getUserDAO().get(request.getUsername());
+        if (existingUser != null) {
+            throw new RuntimeException("[Bad Request] Username already taken");
+        }
+
         byte[] salt = getUniversal_salt();
         int hash = hashPassword(request.getPassword(), salt);
         String url = getImageDAO().addImage(request.getImageBytesBase64(), request.getUsername());
@@ -118,6 +123,7 @@ public class UserService {
         getUserDAO().create(userBean);
         AuthToken authToken = generateAuthToken(System.currentTimeMillis());
         User user = new User(request.getFirstName(), request.getLastName(),request.getUsername(), url);
+
         return new RegisterResponse(user, authToken);
     }
 
@@ -148,44 +154,6 @@ public class UserService {
 
     }
 
-    /**
-     * Returns the dummy user to be returned by the login operation.
-     * This is written as a separate method to allow mocking of the dummy user.
-     *
-     * @return a dummy user.
-     */
-    User getDummyUser() {
-        return getFakeData().getFirstUser();
-    }
-
-    /**
-     * Returns the dummy auth token to be returned by the login operation.
-     * This is written as a separate method to allow mocking of the dummy auth token.
-     *
-     * @return a dummy auth token.
-     */
-    AuthToken getDummyAuthToken() {
-        return getFakeData().getAuthToken();
-    }
-
-    /**
-     * Returns the {@link FakeData} object used to generate dummy users and auth tokens.
-     * This is written as a separate method to allow mocking of the {@link FakeData}.
-     *
-     * @return a {@link FakeData} instance.
-     */
-    FakeData getFakeData() {
-        return FakeData.getInstance();
-    }
-
-
-
-    public byte[] generateSalt() {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[16];
-        random.nextBytes(salt);
-        return salt;
-    }
     public int hashPassword(String password, byte[] salt) {
         try {
             KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 128);

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import java.io.IOException;
 
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
@@ -33,7 +34,7 @@ public class PostStatusTask extends AuthenticatedTask {
 
     @Override
     protected void runTask() throws IOException, TweeterRemoteException {
-        PostStatusRequest request = new PostStatusRequest(authToken, status);
+        PostStatusRequest request = new PostStatusRequest(authToken, status, Cache.getInstance().getCurrUser());
         PostStatusResponse response = getServerFacade().postStatus(request, URL_PATH);
         try {
             if (response.isSuccess()) {

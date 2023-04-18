@@ -244,8 +244,7 @@ public class FollowDAODynamo extends DynamoDAO implements FollowDAO {
                 .partitionValue(request.getFolloweeAlias())
                 .build();
         QueryEnhancedRequest.Builder requestBuilder = QueryEnhancedRequest.builder()
-                .queryConditional(QueryConditional.keyEqualTo(key))
-                .scanIndexForward(false);
+                .queryConditional(QueryConditional.keyEqualTo(key)).limit(request.getLimit());
         QueryEnhancedRequest enhancedRequest = requestBuilder.build();
         List<FollowsBean> followers = new ArrayList<>();
         SdkIterable<Page<FollowsBean>> iterable = index.query(enhancedRequest);
@@ -289,6 +288,18 @@ public class FollowDAODynamo extends DynamoDAO implements FollowDAO {
                     followers.addAll(page.items());
                 });
         return followers;
+    }
+
+    @Override
+    public SdkIterable<Page<FollowsBean>> getFollowersFeed(String alias) {
+        Key key = Key.builder()
+                .partitionValue(alias)
+                .build();
+        QueryEnhancedRequest.Builder request = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.keyEqualTo(key))
+                .scanIndexForward(true);
+        QueryEnhancedRequest enhancedRequest = request.build();
+        return index.query(enhancedRequest);
     }
 
     @Override

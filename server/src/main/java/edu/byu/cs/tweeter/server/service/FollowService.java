@@ -227,8 +227,9 @@ public class FollowService {
 
     private boolean validateAuthToken(AuthToken authToken, String alias) {
         long currTime = System.currentTimeMillis();
+        System.out.println(currTime);
         System.out.println(currTime - Long.parseLong(authToken.getDatetime()));
-        if (authToken == null || currTime - Long.parseLong(authToken.getDatetime()) > 300000) {
+        if (currTime - Long.parseLong(authToken.getDatetime()) > 300000) {
             if (authToken != null) {
                 getAuthTokenDAO().delete(authToken.getToken());
             }
@@ -240,24 +241,6 @@ public class FollowService {
         return true;
     }
 
-    /**
-     * Gets the count of users from the database that the user specified is following. The
-     * current implementation uses generated data and doesn't actually access a database.
-     *
-     * @param follower the User whose count of how many following is desired.
-     * @return said count.
-     */
-    public Integer getFolloweeCount(User follower) {
-        // TODO: uses the dummy data.  Replace with a real implementation.
-        // Includes user at the moment
-        assert follower != null;
-        // -1 for the user
-        return 20;
-    }
-
-    FakeData getFakeData() {
-        return FakeData.getInstance();
-    }
     FollowDAO getFollowDAO() {
         return followDAO;
     }

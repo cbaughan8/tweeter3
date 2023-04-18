@@ -9,7 +9,7 @@ public class FeedRequest extends PagedStatusRequest {
         super();
     }
 
-    public FeedRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus) {
-        super(authToken, targetUser, limit, lastStatus);
+    public FeedRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus, User currUser) {
+        super(authToken, targetUser, limit, lastStatus, currUser);
     }
 }

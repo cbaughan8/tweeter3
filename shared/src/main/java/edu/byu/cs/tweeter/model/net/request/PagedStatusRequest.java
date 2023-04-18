@@ -10,13 +10,16 @@ public abstract class PagedStatusRequest {
     private int limit;
     public Status lastStatus;
 
+    private User currUser;
+
     protected PagedStatusRequest() {}
 
-    public PagedStatusRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus) {
+    public PagedStatusRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus, User currUser) {
         this.authToken = authToken;
         this.targetUser = targetUser;
         this.limit = limit;
         this.lastStatus = lastStatus;
+        this.currUser = currUser;
     }
 
     public AuthToken getAuthToken() {
@@ -49,5 +52,13 @@ public abstract class PagedStatusRequest {
 
     public void setLastStatus(Status lastStatus) {
         this.lastStatus = lastStatus;
+    }
+
+    public User getCurrUser() {
+        return currUser;
+    }
+
+    public void setCurrUser(User currUser) {
+        this.currUser = currUser;
     }
 }

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.byu.cs.tweeter.model.domain.Status;
-import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.StoryRequest;
 import edu.byu.cs.tweeter.model.net.response.StoryResponse;
 import edu.byu.cs.tweeter.server.dao.beans.StoryBean;
@@ -31,18 +30,24 @@ public class StoryDAODynamo extends DynamoDAO implements StoryDAO {
     private static final DynamoDbTable<StoryBean> table = enhancedClient.table(TableName, TableSchema.fromBean(StoryBean.class));
 
 
+    @Override
     public List<StoryBean> getStatuses(StoryRequest request) {
         Key key = Key.builder()
                 .partitionValue(request.getTargetUser().getAlias())
                 .build();
         QueryEnhancedRequest.Builder requestBuilder = QueryEnhancedRequest.builder()
                 .queryConditional(QueryConditional.keyEqualTo(key))
-                .limit(request.getLimit());
-        if (isNotEmptyString(String.valueOf(request.getLastStatus().getTimestamp()))) {
-            Map<String, AttributeValue> startKey = new HashMap<>();
-            startKey.put("alias", AttributeValue.builder().s(request.getTargetUser().getAlias()).build());
-            startKey.put("timestamp", AttributeValue.builder().s(String.valueOf(request.getLastStatus().getTimestamp())).build());
-            requestBuilder.exclusiveStartKey(startKey);
+                .limit(request.getLimit())
+                .scanIndexForward(false);
+        System.out.println(request);
+        System.out.println(request.getLastStatus());
+        if (request.getLastStatus() != null) {
+            if (isNotEmptyString(String.valueOf(request.getLastStatus().getTimestamp()))) {
+                Map<String, AttributeValue> startKey = new HashMap<>();
+                startKey.put("sender_alias", AttributeValue.builder().s(request.getTargetUser().getAlias()).build());
+                startKey.put("timestamp", AttributeValue.builder().s(String.valueOf(request.getLastStatus().getTimestamp())).build());
+                requestBuilder.exclusiveStartKey(startKey);
+            }
         }
         QueryEnhancedRequest enhancedRequest = requestBuilder.build();
 
@@ -58,6 +63,7 @@ public class StoryDAODynamo extends DynamoDAO implements StoryDAO {
         return statuses;
     }
 
+    @Override
     public void create(StoryBean storyBean) {
         try {
             table.putItem(storyBean);
@@ -72,9 +78,6 @@ public class StoryDAODynamo extends DynamoDAO implements StoryDAO {
         return new StoryResponse(dummyData.getFirst(), dummyData.getSecond());
     }
 
-//    public boolean hasMorePages() {
-//        return hasMorePages;
-//    }
     private static boolean isNotEmptyString(String value) {
         return (value != null && value.length() > 0);
     }
@@ -99,6 +102,7 @@ public class StoryDAODynamo extends DynamoDAO implements StoryDAO {
         return statusesIndex;
     }
 
+    @Override
     public boolean hasMorePages() {
         return hasMorePages;
     }

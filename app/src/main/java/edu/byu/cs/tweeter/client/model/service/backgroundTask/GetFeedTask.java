@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.List;
 
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -31,7 +32,8 @@ public class GetFeedTask extends PagedStatusTask {
     @Override
     protected void getItems() {
         try {
-            FeedRequest request = new FeedRequest(authToken, getTargetUser(), getLimit(), getLastItem());
+            FeedRequest request = new FeedRequest(authToken, getTargetUser(),
+                    getLimit(), getLastItem(), Cache.getInstance().getCurrUser());
             FeedResponse response = getServerFacade().getFeed(request, URL_PATH);
             if (response.isSuccess()) {
                 setItems(response.getFeed());
@@ -44,6 +46,5 @@ public class GetFeedTask extends PagedStatusTask {
             Log.e(LOG_TAG, "Failed to get feed", ex);
             sendExceptionMessage(ex);
         }
-//        return getFakeData().getPageOfStatus(getLastItem(), getLimit());
     }
 }

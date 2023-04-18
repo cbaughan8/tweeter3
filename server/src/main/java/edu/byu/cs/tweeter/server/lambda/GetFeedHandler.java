@@ -11,7 +11,7 @@ public class GetFeedHandler extends Handler implements RequestHandler<FeedReques
 
     @Override
     public FeedResponse handleRequest(FeedRequest request, Context context) {
-        StatusService statusService = new StatusService(getFeedDAO());
+        StatusService statusService = new StatusService(getStoryDAO(), getFeedDAO(), getUserDao(),getFollowDao(), getAuthTokenDAO());
         return statusService.getFeed(request);
     }
 }

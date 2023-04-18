@@ -9,7 +9,7 @@ public class StoryRequest extends PagedStatusRequest {
         super();
     }
 
-    public StoryRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus) {
-        super(authToken, targetUser, limit, lastStatus);
+    public StoryRequest(AuthToken authToken, User targetUser, int limit, Status lastStatus, User currUser) {
+        super(authToken, targetUser, limit, lastStatus, currUser);
     }
 }

@@ -12,7 +12,7 @@ public class PostStatusHandler extends Handler implements RequestHandler<PostSta
 
     @Override
     public PostStatusResponse handleRequest(PostStatusRequest request, Context context) {
-        StatusService statusService = new StatusService(getStoryDAO(), getFeedDAO());
+        StatusService statusService = new StatusService(getStoryDAO(), getFeedDAO(), getUserDao(), getFollowDao(), getAuthTokenDAO());
         return statusService.postStatus(request);
     }
 }

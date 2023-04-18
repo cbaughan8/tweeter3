@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.List;
 
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -32,7 +33,8 @@ public class GetStoryTask extends PagedStatusTask {
     @Override
     protected void getItems() {
         try {
-            StoryRequest request = new StoryRequest(authToken, getTargetUser(), getLimit(), getLastItem());
+            StoryRequest request = new StoryRequest(authToken, getTargetUser(),
+                    getLimit(), getLastItem(), Cache.getInstance().getCurrUser());
             StoryResponse response = getServerFacade().getStory(request, URL_PATH);
             if (response.isSuccess()) {
                 setItems(response.getStory());

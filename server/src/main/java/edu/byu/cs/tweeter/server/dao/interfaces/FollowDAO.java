@@ -8,6 +8,8 @@ import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.server.dao.beans.DataPage;
 import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
+import software.amazon.awssdk.core.pagination.sync.SdkIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 
 public interface FollowDAO {
     public DataPage<FollowsBean> getPageOfFollowers(String targetUserAlias, int limit, String lastUserAlias);
@@ -26,6 +28,8 @@ public interface FollowDAO {
     List<FollowsBean> getFollowers(FollowersRequest request);
 
     List<FollowsBean> getFollowees(FollowingRequest request);
+
+    SdkIterable<Page<FollowsBean>> getFollowersFeed(String alias);
 
     boolean hasMorePages();
 }

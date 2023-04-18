@@ -11,7 +11,7 @@ import edu.byu.cs.tweeter.server.service.StatusService;
 public class GetStoryHandler extends Handler implements RequestHandler<StoryRequest, StoryResponse> {
     @Override
     public StoryResponse handleRequest(StoryRequest request, Context context) {
-        StatusService statusService = new StatusService(getStoryDAO());
+        StatusService statusService = new StatusService(getStoryDAO(), getFeedDAO(), getUserDao(), getFollowDao(), getAuthTokenDAO());
         return statusService.getStory(request);
     }
 }

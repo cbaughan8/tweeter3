@@ -9,7 +9,7 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 
 @DynamoDbBean
 public class StoryBean {
-    String alias;
+    String sender_alias;
     long timestamp;
     String post;
     List<String> mentions;
@@ -18,21 +18,23 @@ public class StoryBean {
     public StoryBean() {
     }
 
-    public StoryBean(String alias, long timestamp, String post, List<String> mentions, List<String> urls) {
-        this.alias = alias;
+    public StoryBean(String sender_alias, long timestamp, String post, List<String> mentions, List<String> urls) {
+        this.sender_alias = sender_alias;
         this.timestamp = timestamp;
         this.post = post;
         this.mentions = mentions;
         this.urls = urls;
     }
 
+
+
     @DynamoDbPartitionKey
-    public String getAlias() {
-        return alias;
+    public String getSender_alias() {
+        return sender_alias;
     }
 
-    public void setAlias(String alias) {
-        this.alias = alias;
+    public void setSender_alias(String sender_alias) {
+        this.sender_alias = sender_alias;
     }
 
     @DynamoDbSortKey
@@ -71,7 +73,7 @@ public class StoryBean {
     @Override
     public String toString() {
         return "Story{" +
-                "alias='" + alias + '\'' +
+                "sender_alias='" + sender_alias + '\'' +
                 ", timestamp=" + timestamp +
                 ", post='" + post + '\'' +
                 ", mentions=" + mentions +

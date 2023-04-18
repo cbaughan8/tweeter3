@@ -8,7 +8,9 @@ import java.util.Map;
 import edu.byu.cs.tweeter.model.net.request.FeedRequest;
 import edu.byu.cs.tweeter.model.net.response.FeedResponse;
 import edu.byu.cs.tweeter.server.dao.beans.FeedBean;
+import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
 import edu.byu.cs.tweeter.server.dao.interfaces.FeedDAO;
+import software.amazon.awssdk.core.pagination.sync.SdkIterable;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
 import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
@@ -17,6 +19,7 @@ import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 
 public class FeedDAODynamo extends DynamoDAO implements FeedDAO {
 
@@ -24,6 +27,7 @@ public class FeedDAODynamo extends DynamoDAO implements FeedDAO {
     private boolean hasMorePages;
     private static final DynamoDbTable<FeedBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FeedBean.class));
 
+    @Override
     public List<FeedBean> getStatuses(FeedRequest request) {
         Key key = Key.builder()
                 .partitionValue(request.getTargetUser().getAlias())
@@ -31,11 +35,13 @@ public class FeedDAODynamo extends DynamoDAO implements FeedDAO {
         QueryEnhancedRequest.Builder requestBuilder = QueryEnhancedRequest.builder()
                 .queryConditional(QueryConditional.keyEqualTo(key))
                 .limit(request.getLimit()).scanIndexForward(false);
-        if (isNotEmptyString(String.valueOf(request.getLastStatus().getTimestamp()))) {
-            Map<String, AttributeValue> startKey = new HashMap<>();
-            startKey.put("reciever_alias", AttributeValue.builder().s(request.getTargetUser().getAlias()).build());
-            startKey.put("timestamp", AttributeValue.builder().n(String.valueOf(request.getLastStatus().getTimestamp())).build());
-            requestBuilder.exclusiveStartKey(startKey);
+        if (request.getLastStatus() != null) {
+            if (isNotEmptyString(String.valueOf(request.getLastStatus().getTimestamp()))) {
+                Map<String, AttributeValue> startKey = new HashMap<>();
+                startKey.put("receiver_alias", AttributeValue.builder().s(request.getTargetUser().getAlias()).build());
+                startKey.put("timestamp", AttributeValue.builder().n(String.valueOf(request.getLastStatus().getTimestamp())).build());
+                requestBuilder.exclusiveStartKey(startKey);
+            }
         }
         QueryEnhancedRequest enhancedRequest = requestBuilder.build();
 
@@ -51,6 +57,16 @@ public class FeedDAODynamo extends DynamoDAO implements FeedDAO {
         return statuses;
     }
 
+
+
+    @Override
+    public void create(FeedBean bean) {
+        try {
+            table.putItem(bean);
+        } catch (DynamoDbException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     public boolean hasMorePages() {
         return hasMorePages;
