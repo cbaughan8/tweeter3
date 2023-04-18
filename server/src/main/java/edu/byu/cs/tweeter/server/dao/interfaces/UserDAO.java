@@ -9,4 +9,5 @@ public interface UserDAO  {
 
     public UserBean get(String alias);
 
+    void update(UserBean userBean);
 }

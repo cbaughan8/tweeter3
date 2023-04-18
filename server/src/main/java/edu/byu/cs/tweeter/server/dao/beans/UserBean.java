@@ -11,8 +11,8 @@ public class UserBean {
     String last_name;
     String image_url;
     int password_hash;
-    int followee_count;
-    int follower_count;
+    public int followee_count;
+    public int follower_count;
 
     public UserBean() {
     }

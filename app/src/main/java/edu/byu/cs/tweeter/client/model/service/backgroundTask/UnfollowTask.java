@@ -4,11 +4,11 @@ import android.os.Handler;
 
 import java.io.IOException;
 
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
-import edu.byu.cs.tweeter.model.net.response.Response;
 import edu.byu.cs.tweeter.model.net.response.ToggleFollowResponse;
 
 /**
@@ -24,7 +24,7 @@ public class UnfollowTask extends ToggleFollowTask {
 
     @Override
     public ToggleFollowResponse getResponse() throws IOException, TweeterRemoteException {
-        FollowRequest request = new FollowRequest(authToken, followee);
+        FollowRequest request = new FollowRequest(authToken, followee, Cache.getInstance().getCurrUser());
         return getServerFacade().unfollow(request, URL_PATH);
     }
 

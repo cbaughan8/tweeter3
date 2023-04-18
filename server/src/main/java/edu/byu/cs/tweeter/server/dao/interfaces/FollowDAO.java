@@ -1,5 +1,10 @@
 package edu.byu.cs.tweeter.server.dao.interfaces;
 
+import java.util.List;
+
+import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.server.dao.beans.DataPage;
 import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
@@ -17,11 +22,10 @@ public interface FollowDAO {
     public void delete(FollowsBean followsBean);
 
     public FollowsBean getFollower(String followerAlias, String followeeAlias);
-//    public FollowingResponse getFollowing(FollowingRequest request);
-//    public FollowersResponse getFollowers(FollowersRequest request);
-//    public FollowingCountResponse getFollowingCount(FollowingCountRequest request);
-//    public FollowersCountResponse getFollowersCount(FollowersCountRequest request);
-//    public FollowResponse follow(FollowRequest request);
-//    public UnfollowResponse unfollow(UnfollowRequest request);
-//    public IsFollowerResponse isFollower(IsFollowerRequest request);
+
+    List<FollowsBean> getFollowers(FollowersRequest request);
+
+    List<FollowsBean> getFollowees(FollowingRequest request);
+
+    boolean hasMorePages();
 }

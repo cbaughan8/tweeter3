@@ -4,6 +4,7 @@ import android.os.Handler;
 
 import java.io.IOException;
 
+import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
@@ -29,7 +30,7 @@ public class FollowTask extends ToggleFollowTask {
 
     @Override
     public ToggleFollowResponse getResponse() throws IOException, TweeterRemoteException {
-        FollowRequest request = new FollowRequest(authToken, followee);
+        FollowRequest request = new FollowRequest(authToken, followee, Cache.getInstance().getCurrUser());
         return getServerFacade().follow(request, URL_PATH);
     }
 

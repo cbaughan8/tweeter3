@@ -27,7 +27,7 @@ import edu.byu.cs.tweeter.util.Pair;
 /**
  * A DAO for accessing 'following' data from the database.
  */
-public class FollowDAODummy implements FollowDAO {
+public class FollowDAODummy {
 
     /**
      * Gets the count of users from the database that the user specified is following. The
@@ -148,38 +148,5 @@ public class FollowDAODummy implements FollowDAO {
     }
 
 
-    @Override
-    public DataPage<FollowsBean> getPageOfFollowers(String targetUserAlias, int limit, String lastUserAlias) {
-        return null;
-    }
 
-    @Override
-    public DataPage<FollowsBean> getPageOfFollowees(String targetUserAlias, int limit, String lastUserAlias) {
-        return null;
-    }
-
-    @Override
-    public void deleteDynamoDBItem(String followerHandleVal, String followeeHandleVal) {
-
-    }
-
-    @Override
-    public void putItemInTable(String followersHandleVal, String followerNameVal, String followeesHandleVal, String followeeNameVal) {
-
-    }
-
-    @Override
-    public void create(FollowsBean followsBean) {
-
-    }
-
-    @Override
-    public void delete(FollowsBean followsBean) {
-
-    }
-
-    @Override
-    public FollowsBean getFollower(String followerAlias, String followeeAlias) {
-        return null;
-    }
 }

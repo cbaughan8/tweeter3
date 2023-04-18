@@ -10,9 +10,7 @@ public class FollowRequest extends  ToggleFollowRequest {
         super();
     }
 
-    public FollowRequest(AuthToken authToken, User selectedUser) {
-        super(authToken, selectedUser);
-        this.authToken = authToken;
-        this.selectedUser = selectedUser;
+    public FollowRequest(AuthToken authToken, User selectedUser, User currUser) {
+        super(authToken, selectedUser, currUser);
     }
 }

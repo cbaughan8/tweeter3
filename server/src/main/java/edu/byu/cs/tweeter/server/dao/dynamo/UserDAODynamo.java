@@ -26,4 +26,13 @@ public class UserDAODynamo extends DynamoDAO implements UserDAO {
                 .build();
         return table.getItem(key);
     }
+
+    @Override
+    public void update(UserBean userBean) {
+        try {
+            table.updateItem(userBean);
+        } catch (DynamoDbException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 }

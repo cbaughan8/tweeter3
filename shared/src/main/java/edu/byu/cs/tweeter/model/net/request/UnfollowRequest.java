@@ -10,8 +10,8 @@ public class UnfollowRequest extends ToggleFollowRequest {
         super();
     }
 
-    public UnfollowRequest(AuthToken authToken, User selectedUser) {
-        super(authToken, selectedUser);
+    public UnfollowRequest(AuthToken authToken, User selectedUser, User currUser) {
+        super(authToken, selectedUser, currUser);
     }
 
 

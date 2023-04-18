@@ -1,13 +1,17 @@
 package edu.byu.cs.tweeter.server.dao.dynamo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.server.dao.beans.DataPage;
 import edu.byu.cs.tweeter.server.dao.beans.FollowsBean;
 import edu.byu.cs.tweeter.server.dao.interfaces.FollowDAO;
 import software.amazon.awssdk.core.pagination.sync.SdkIterable;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbIndex;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbTable;
 import software.amazon.awssdk.enhanced.dynamodb.Key;
@@ -16,8 +20,6 @@ import software.amazon.awssdk.enhanced.dynamodb.model.Page;
 import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.QueryEnhancedRequest;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeAction;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
@@ -25,15 +27,15 @@ import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.DynamoDbException;
 import software.amazon.awssdk.services.dynamodb.model.PutItemRequest;
 import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
-import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
-import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.ResourceNotFoundException;
 import software.amazon.awssdk.services.dynamodb.model.UpdateItemRequest;
 
-public class FollowDAODynamo implements FollowDAO {
+public class FollowDAODynamo extends DynamoDAO implements FollowDAO {
 
     private static final String TableName = "follows";
     public static final String IndexName = "follows_index";
+
+    private boolean hasMorePages;
 
     private static final String followerHandle = "follower_handle";
     private static final String followeeHandle = "followee_handle";
@@ -41,16 +43,8 @@ public class FollowDAODynamo implements FollowDAO {
     private static final String followerName = "follower_name";
     private static final String followeeName = "followee_name";
 
-    private static final DynamoDbClient dynamoDbClient = DynamoDbClient.builder()
-            .region(Region.US_WEST_2)
-            .build();
-
-    private static final DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder()
-            .dynamoDbClient(dynamoDbClient)
-            .build();
-
     private static final DynamoDbTable<FollowsBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class));
-
+    private static final DynamoDbIndex<FollowsBean> index = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class)).index(IndexName);
 
     private static boolean isNonEmptyString(String value) {
         return (value != null && value.length() > 0);
@@ -107,41 +101,6 @@ public class FollowDAODynamo implements FollowDAO {
             System.exit(1);
         }
     }
-
-    public static int queryTable(String partitionKeyName, String partitionKeyVal, String partitionAlias) {
-
-        // Set up an alias for the partition key name in case it's a reserved word.
-        HashMap<String,String> attrNameAlias = new HashMap<String,String>();
-        attrNameAlias.put(partitionAlias, partitionKeyName);
-
-        // Set up mapping of the partition name with the value.
-        HashMap<String, AttributeValue> attrValues = new HashMap<>();
-
-        attrValues.put(":"+partitionKeyName, AttributeValue.builder()
-                .s(partitionKeyVal)
-                .build());
-
-        QueryRequest queryReq = QueryRequest.builder()
-                .tableName(TableName)
-                .keyConditionExpression(partitionAlias + " = :" + partitionKeyName)
-                .expressionAttributeNames(attrNameAlias)
-                .expressionAttributeValues(attrValues)
-                .build();
-
-        try {
-            QueryResponse response = dynamoDbClient.query(queryReq);
-            return response.count();
-
-        } catch (DynamoDbException e) {
-            System.err.println(e.getMessage());
-            System.exit(1);
-        }
-        return -1;
-    }
-
-
-
-
 
     public static void updateTableItem(
             String followerHandleVal,
@@ -277,6 +236,68 @@ public class FollowDAODynamo implements FollowDAO {
                 .sortValue(followeeAlias)
                 .build();
         return table.getItem(key);
+    }
+
+    @Override
+    public List<FollowsBean> getFollowers(FollowersRequest request) {
+        Key key = Key.builder()
+                .partitionValue(request.getFolloweeAlias())
+                .build();
+        QueryEnhancedRequest.Builder requestBuilder = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.keyEqualTo(key))
+                .scanIndexForward(false);
+        QueryEnhancedRequest enhancedRequest = requestBuilder.build();
+        List<FollowsBean> followers = new ArrayList<>();
+        SdkIterable<Page<FollowsBean>> iterable = index.query(enhancedRequest);
+        PageIterable<FollowsBean> pages = PageIterable.create(iterable);
+        pages.stream()
+                .limit(1)
+                .forEach(page -> {
+                    hasMorePages = page.lastEvaluatedKey() != null;
+                    followers.addAll(page.items());
+                });
+        return followers;
+    }
+
+    @Override
+    public List<FollowsBean> getFollowees(FollowingRequest request) {
+        DynamoDbTable<FollowsBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FollowsBean.class));
+        Key key = Key.builder()
+                .partitionValue(request.getFollowerAlias())
+                .build();
+
+        QueryEnhancedRequest.Builder requestBuilder = QueryEnhancedRequest.builder()
+                .queryConditional(QueryConditional.keyEqualTo(key))
+                .limit(request.getLimit());
+
+        if (isNotEmptyString(request.getLastFolloweeAlias())) {
+            Map<String, AttributeValue> startKey = new HashMap<>();
+            startKey.put("follower_handle", AttributeValue.builder().s(request.getFollowerAlias()).build());
+            startKey.put("followee_handle", AttributeValue.builder().s(request.getLastFolloweeAlias()).build());
+            requestBuilder.exclusiveStartKey(startKey);
+        }
+
+        QueryEnhancedRequest enhancedRequest = requestBuilder.build();
+
+        List<FollowsBean> followers = new ArrayList<>();
+        FollowingResponse response = new FollowingResponse(new ArrayList<>(), false);
+        PageIterable<FollowsBean> pages = table.query(enhancedRequest);
+        pages.stream()
+                .limit(1)
+                .forEach((Page<FollowsBean> page) -> {
+                    hasMorePages = page.lastEvaluatedKey() != null;
+                    followers.addAll(page.items());
+                });
+        return followers;
+    }
+
+    @Override
+    public boolean hasMorePages() {
+        return hasMorePages;
+    }
+
+    private static boolean isNotEmptyString(String value) {
+        return (value != null && value.length() > 0);
     }
 
 

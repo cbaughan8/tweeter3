@@ -6,11 +6,13 @@ import edu.byu.cs.tweeter.model.domain.User;
 public abstract class ToggleFollowRequest {
     AuthToken authToken;
     User selectedUser;
+    User currUser;
 
     public ToggleFollowRequest() {}
-    public ToggleFollowRequest(AuthToken authToken, User selectedUser) {
+    public ToggleFollowRequest(AuthToken authToken, User selectedUser, User currUser) {
         this.authToken = authToken;
         this.selectedUser = selectedUser;
+        this.currUser = currUser;
     }
 
     public AuthToken getAuthToken() {
@@ -27,5 +29,13 @@ public abstract class ToggleFollowRequest {
 
     public void setSelectedUser(User selectedUser) {
         this.selectedUser = selectedUser;
+    }
+
+    public User getCurrUser() {
+        return currUser;
+    }
+
+    public void setCurrUser(User currUser) {
+        this.currUser = currUser;
     }
 }

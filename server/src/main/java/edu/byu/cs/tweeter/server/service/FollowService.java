@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -13,6 +14,7 @@ import edu.byu.cs.tweeter.model.net.request.FollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.IsFollowerRequest;
+import edu.byu.cs.tweeter.model.net.request.ToggleFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.UnfollowRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowersCountResponse;
@@ -69,22 +71,28 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a follower alias");
         } else if (request.getLimit() <= 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
+        } else if (!validateAuthToken(request.getAuthToken(), request.getFollowerAlias())){
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
 
-        assert request.getLimit() > 0;
-        assert request.getFollowerAlias() != null;
-        User follower = getFakeData().findUserByAlias(request.getFollowerAlias());
-        User lastFollowee = getFakeData().findUserByAlias(request.getLastFolloweeAlias());
+        List<FollowsBean> followsBeanList = getFollowDAO().getFollowees(request);
+        List<User> followees = new ArrayList<>();
+        for (FollowsBean entry : followsBeanList) {
+            UserBean userBean = getUserDAO().get(entry.getFollowee_handle());
+            followees.add(new User(userBean.getFirst_name(), userBean.getLast_name(),
+                    userBean.getAlias(), userBean.getImage_url()));
+        }
+        return new FollowingResponse(followees, getFollowDAO().hasMorePages());
 
-        DataPage<FollowsBean> dataPage = getFollowDAO().getPageOfFollowees(request.getFollowerAlias(),
-                request.getLimit(), request.getLastFolloweeAlias());
-
-        System.out.println("FOLLOWEES!");
-        System.out.println("DATAPAGE VALUES:");
-        System.out.println(dataPage.getValues());
-
-        Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollowee, request.getLimit(), follower);
-        return new FollowingResponse(data.getFirst(), data.getSecond());
+//        User follower = getFakeData().findUserByAlias(request.getFollowerAlias());
+//        User lastFollowee = getFakeData().findUserByAlias(request.getLastFolloweeAlias());
+//
+//        DataPage<FollowsBean> dataPage = getFollowDAO().getPageOfFollowees(request.getFollowerAlias(),
+//                request.getLimit(), request.getLastFolloweeAlias());
+//
+//
+//        Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollowee, request.getLimit(), follower);
+//        return new FollowingResponse(data.getFirst(), data.getSecond());
 //        return getFollowingDAO().getFollowing(request);
     }
 
@@ -97,24 +105,13 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
 
-        //
-        assert request.getLimit() > 0;
-        assert request.getFolloweeAlias() != null;
-
-        DataPage<FollowsBean> dataPage = getFollowDAO().getPageOfFollowers(request.getFolloweeAlias(),
-                request.getLimit(), request.getLastFollowerAlias());
-
-
-        System.out.println("FOLLOWERS!");
-        System.out.println("DATAPAGE VALUES:");
-        System.out.println(dataPage.getValues());
-
-        User followee = getFakeData().findUserByAlias(request.getFolloweeAlias());
-        User lastFollower = getFakeData().findUserByAlias(request.getLastFollowerAlias());
-
-        Pair<List<User>, Boolean> data = getFakeData().getPageOfUsers(lastFollower, request.getLimit(), followee);
-        return new FollowersResponse(data.getFirst(), data.getSecond());
-//        return getFollowingDAO().getFollowers(request);
+        List<FollowsBean> followsBeanList = getFollowDAO().getFollowers(request);
+        List<User> followers = new ArrayList<>();
+        for (FollowsBean entry : followsBeanList) {
+            UserBean userBean = getUserDAO().get(entry.getFollower_handle());
+            followers.add(new User(userBean.getFirst_name(), userBean.getLast_name(), userBean.getAlias(), userBean.getImage_url()));
+        }
+        return new FollowersResponse(followers, getFollowDAO().hasMorePages());
     }
 
     public FollowResponse follow(FollowRequest request) {
@@ -124,17 +121,30 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
 
-        AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
-        UserBean followerUserBean = getUserDAO().get(authTokenBean.getAlias());
+
+        UserBean followerUserBean = authenticateAndUpdate(request, 1);
+        System.out.println(followerUserBean.getAlias());
+        System.out.println(request.getSelectedUser().getAlias());
+        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
+                followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
+        getFollowDAO().create(bean);
+        return new FollowResponse();
+    }
+
+    private UserBean authenticateAndUpdate(ToggleFollowRequest request, int followChange) {
+        UserBean followeeUserBean = getUserDAO().get(request.getSelectedUser().getAlias());
+        UserBean followerUserBean = getUserDAO().get(request.getCurrUser().getAlias());
+        System.out.println(followeeUserBean.getAlias());
 
         if (!validateAuthToken(request.getAuthToken(), followerUserBean.getAlias())){
             throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
 
-        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
-                followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
-        getFollowDAO().create(bean);
-        return new FollowResponse();
+        followeeUserBean.setFollower_count(followeeUserBean.getFollower_count() + followChange);
+        followerUserBean.setFollowee_count(followerUserBean.getFollowee_count() + followChange);
+        getUserDAO().update(followerUserBean);
+        getUserDAO().update(followeeUserBean);
+        return followerUserBean;
     }
 
     public UnfollowResponse unfollow(UnfollowRequest request) {
@@ -143,13 +153,8 @@ public class FollowService {
         } else if (request.getSelectedUser() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
-        AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
-        UserBean followerUserBean = getUserDAO().get(authTokenBean.getAlias());
 
-        if (!validateAuthToken(request.getAuthToken(), followerUserBean.getAlias())){
-            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
-        }
-
+        UserBean followerUserBean = authenticateAndUpdate(request, -1);
         FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
                 followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
         getFollowDAO().delete(bean);
@@ -176,18 +181,19 @@ public class FollowService {
 
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
-        // getUser and pull following count from that
 
+        UserBean userBean = getUserDAO().get(request.getTargetUser().getAlias());
 
-        return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
+        return new FollowersCountResponse(userBean.getFollower_count());
 
     }
 
     public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
         getCountCheck(request);
-        // getUser and pull following count from that
 
-        return new FollowingCountResponse(getFolloweeCount(request.getTargetUser()));
+        UserBean userBean = getUserDAO().get(request.getTargetUser().getAlias());
+
+        return new FollowingCountResponse(userBean.getFollowee_count());
     }
 
     private void getCountCheck(CountRequest request) {
