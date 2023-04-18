@@ -270,6 +270,14 @@ public class FollowDAODynamo implements FollowDAO {
         table.deleteItem(key);
     }
 
+    @Override
+    public FollowsBean getFollower(String followerAlias, String followeeAlias) {
+        Key key = Key.builder()
+                .partitionValue(followerAlias)
+                .sortValue(followeeAlias)
+                .build();
+        return table.getItem(key);
+    }
 
 
 

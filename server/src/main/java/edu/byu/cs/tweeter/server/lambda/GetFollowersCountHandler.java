@@ -11,7 +11,7 @@ public class GetFollowersCountHandler extends Handler implements RequestHandler
                                 <FollowersCountRequest, FollowersCountResponse> {
     @Override
     public FollowersCountResponse handleRequest(FollowersCountRequest request, Context context) {
-        FollowService followService = new FollowService(getFollowDao());
+        FollowService followService = new FollowService(getFollowDao(), getUserDao(), getAuthTokenDAO());
         return followService.getFollowersCount(request);
     }
 }

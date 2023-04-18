@@ -1,8 +1,10 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.CountRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
@@ -48,18 +50,10 @@ public class FollowService {
         this.authTokenDAO = authTokenDAO;
     }
 
-    public FollowService(UserDAO userDAO, FollowDAO followDAO) {
-        this.userDAO = userDAO;
-        this.followDAO = followDAO;
-    }
-
     public FollowService(FollowDAO followDAO) {
         this.followDAO = followDAO;
     }
 
-    public FollowService(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
 
     /**
      * Returns the users that the user specified in the request is following. Uses information in
@@ -99,8 +93,11 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a followee alias");
         } else if (request.getLimit() <= 0) {
             throw new RuntimeException("[Bad Request] Request needs to have a positive limit");
+        } else if (!validateAuthToken(request.getAuthToken(), request.getFolloweeAlias())){
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
 
+        //
         assert request.getLimit() > 0;
         assert request.getFolloweeAlias() != null;
 
@@ -128,11 +125,14 @@ public class FollowService {
         }
 
         AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
-        UserBean selectedUserBean = getUserDAO().get(authTokenBean.getAlias());
-        UserBean followerUserBean = getUserDAO().get(request.getSelectedUser().getAlias());
+        UserBean followerUserBean = getUserDAO().get(authTokenBean.getAlias());
 
-        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), selectedUserBean.getAlias(),
-                followerUserBean.getFirst_name(), selectedUserBean.getFirst_name());
+        if (!validateAuthToken(request.getAuthToken(), followerUserBean.getAlias())){
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
+        }
+
+        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
+                followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
         getFollowDAO().create(bean);
         return new FollowResponse();
     }
@@ -144,11 +144,14 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
         AuthTokenBean authTokenBean = getAuthTokenDAO().get(request.getAuthToken().getToken());
-        UserBean selectedUserBean = getUserDAO().get(authTokenBean.getAlias());
-        UserBean followerUserBean = getUserDAO().get(request.getSelectedUser().getAlias());
+        UserBean followerUserBean = getUserDAO().get(authTokenBean.getAlias());
 
-        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), selectedUserBean.getAlias(),
-                followerUserBean.getFirst_name(), selectedUserBean.getFirst_name());
+        if (!validateAuthToken(request.getAuthToken(), followerUserBean.getAlias())){
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
+        }
+
+        FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
+                followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
         getFollowDAO().delete(bean);
 
         return new UnfollowResponse();
@@ -161,30 +164,30 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a followee");
         } else if (request.getAuthToken() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
+        } else if (!validateAuthToken(request.getAuthToken(), request.getFollower().getAlias())){
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
 
+        boolean isFollower = followDAO.getFollower(request.getFollower().getAlias(),
+                request.getFollowee().getAlias()) != null;
 
-        return new IsFollowerResponse(new Random().nextInt() > 0);
-//        return getFollowingDAO().isFollower(request);
+        return new IsFollowerResponse(isFollower);
     }
 
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
-
         // getUser and pull following count from that
 
 
         return new FollowersCountResponse(getFolloweeCount(request.getTargetUser()));
-//        return followDAODummy.getFollowersCount(request);
+
     }
 
     public FollowingCountResponse getFollowingCount(FollowingCountRequest request) {
         getCountCheck(request);
-
         // getUser and pull following count from that
 
         return new FollowingCountResponse(getFolloweeCount(request.getTargetUser()));
-//        return followDAODummy.getFollowingCount(request);
     }
 
     private void getCountCheck(CountRequest request) {
@@ -192,6 +195,8 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have an authToken");
         } else if (request.getTargetUser() == null){
             throw new RuntimeException("[Bad Request] Request needs to have a target user");
+        } else if (!validateAuthToken(request.getAuthToken(), request.getTargetUser().getAlias())) {
+            throw new RuntimeException("[Bad Request] Invalid authtoken provided");
         }
     }
 
@@ -212,6 +217,21 @@ public class FollowService {
         }
 
         return followeesIndex;
+    }
+
+    private boolean validateAuthToken(AuthToken authToken, String alias) {
+        long currTime = System.currentTimeMillis();
+        System.out.println(currTime - Long.parseLong(authToken.getDatetime()));
+        if (authToken == null || currTime - Long.parseLong(authToken.getDatetime()) > 300000) {
+            if (authToken != null) {
+                getAuthTokenDAO().delete(authToken.getToken());
+            }
+            return false;
+        }
+        AuthTokenBean newAuthTokenBean = new AuthTokenBean(authToken.getToken(), Long.parseLong(authToken.getDatetime()), alias);
+        System.out.println(newAuthTokenBean);
+        getAuthTokenDAO().update(newAuthTokenBean);
+        return true;
     }
 
     /**

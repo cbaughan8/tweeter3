@@ -23,7 +23,7 @@ public class GetFollowingHandler extends Handler implements RequestHandler<Follo
      */
     @Override
     public FollowingResponse handleRequest(FollowingRequest request, Context context) {
-        FollowService service = new FollowService(getFollowDao());
+        FollowService service = new FollowService(getFollowDao(), getUserDao(), getAuthTokenDAO());
         return service.getFollowees(request);
     }
 }

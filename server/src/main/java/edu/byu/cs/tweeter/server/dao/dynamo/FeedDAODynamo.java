@@ -23,7 +23,7 @@ public class FeedDAODynamo extends DynamoDAO implements FeedDAO {
     private static final String TableName = "feeds";
     private boolean hasMorePages;
     private static final DynamoDbTable<FeedBean> table = enhancedClient.table(TableName, TableSchema.fromBean(FeedBean.class));
-    
+
     public List<FeedBean> getStatuses(FeedRequest request) {
         Key key = Key.builder()
                 .partitionValue(request.getTargetUser().getAlias())

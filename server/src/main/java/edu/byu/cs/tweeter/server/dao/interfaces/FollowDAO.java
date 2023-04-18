@@ -15,6 +15,8 @@ public interface FollowDAO {
 
     public void create(FollowsBean followsBean);
     public void delete(FollowsBean followsBean);
+
+    public FollowsBean getFollower(String followerAlias, String followeeAlias);
 //    public FollowingResponse getFollowing(FollowingRequest request);
 //    public FollowersResponse getFollowers(FollowersRequest request);
 //    public FollowingCountResponse getFollowingCount(FollowingCountRequest request);

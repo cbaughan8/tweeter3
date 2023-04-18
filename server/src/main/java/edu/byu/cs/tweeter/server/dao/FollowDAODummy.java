@@ -177,4 +177,9 @@ public class FollowDAODummy implements FollowDAO {
     public void delete(FollowsBean followsBean) {
 
     }
+
+    @Override
+    public FollowsBean getFollower(String followerAlias, String followeeAlias) {
+        return null;
+    }
 }

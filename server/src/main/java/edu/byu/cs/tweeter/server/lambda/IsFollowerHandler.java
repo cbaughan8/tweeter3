@@ -11,7 +11,7 @@ public class IsFollowerHandler extends Handler implements RequestHandler<IsFollo
 
     @Override
     public IsFollowerResponse handleRequest(IsFollowerRequest request, Context context) {
-        FollowService followService = new FollowService(getFollowDao());
+        FollowService followService = new FollowService(getFollowDao(), getUserDao(), getAuthTokenDAO());
         return followService.isFollower(request);
     }
 }
