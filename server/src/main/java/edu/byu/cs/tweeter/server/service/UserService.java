@@ -37,20 +37,10 @@ import edu.byu.cs.tweeter.util.FakeData;
 public class UserService {
 
     UserDAO userDAO;
-
     AuthTokenDAO authTokenDAO;
     ImageDAO imageDAO;
 
     byte[] universal_salt = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-    public UserService(UserDAO userDAO, AuthTokenDAO authTokenDAO) {
-        this.authTokenDAO = authTokenDAO;
-        this.userDAO = userDAO;
-    }
-
-    public UserService(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
 
     public UserService(UserDAO userDAO, AuthTokenDAO authTokenDAO ,ImageDAO imageDAO) {
         this.userDAO = userDAO;
@@ -76,7 +66,6 @@ public class UserService {
         AuthToken token = generateAuthToken(timestamp);
 
         AuthTokenBean authTokenBean = new AuthTokenBean(token.getToken(), timestamp, request.getUsername());
-        System.out.println(authTokenBean);
         getAuthTokenDAO().create(authTokenBean);
         return new LoginResponse(new User(userBean.getFirst_name(), userBean.getLast_name(),
                 userBean.getAlias(), userBean.getImage_url()), token);
@@ -168,11 +157,11 @@ public class UserService {
     }
 
     AuthToken generateAuthToken(long timestamp){
-        byte[] array = new byte[12]; // length is bounded by 7
+        byte[] array = new byte[12];
         new Random().nextBytes(array);
         String tokenString = new String(array, StandardCharsets.UTF_8);
         Date date = new Date(timestamp);
-        String dateTime = String.valueOf(date.getTime()) + String.valueOf(date.getDate());
+        String dateTime = String.valueOf(date.getTime());
         return new AuthToken(tokenString, dateTime);
     }
 

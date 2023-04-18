@@ -10,7 +10,7 @@ import edu.byu.cs.tweeter.server.service.UserService;
 public class LogoutHandler extends Handler implements RequestHandler<LogoutRequest, LogoutResponse> {
     @Override
     public LogoutResponse handleRequest(LogoutRequest request, Context context) {
-        UserService userService = new UserService(getUserDao());
+        UserService userService = new UserService(getUserDao(), getAuthTokenDAO(), getImageDao());
         return userService.logout(request);
     }
 }

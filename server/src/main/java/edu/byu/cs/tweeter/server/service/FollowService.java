@@ -52,20 +52,6 @@ public class FollowService {
         this.authTokenDAO = authTokenDAO;
     }
 
-    public FollowService(FollowDAO followDAO) {
-        this.followDAO = followDAO;
-    }
-
-
-    /**
-     * Returns the users that the user specified in the request is following. Uses information in
-     * the request object to limit the number of followees returned and to return the next set of
-     * followees after any that were returned in a previous request. Uses the {@link FollowDAODummy} to
-     * get the followees.
-     *
-     * @param request contains the data required to fulfill the request.
-     * @return the followees.
-     */
     public FollowingResponse getFollowees(FollowingRequest request) {
         if (request.getFollowerAlias() == null) {
             throw new RuntimeException("[Bad Request] Request needs to have a follower alias");
@@ -121,10 +107,7 @@ public class FollowService {
             throw new RuntimeException("[Bad Request] Request needs to have a user selected");
         }
 
-
         UserBean followerUserBean = authenticateAndUpdate(request, 1);
-        System.out.println(followerUserBean.getAlias());
-        System.out.println(request.getSelectedUser().getAlias());
         FollowsBean bean = new FollowsBean(followerUserBean.getAlias(), request.getSelectedUser().getAlias(),
                 followerUserBean.getFirst_name(), request.getSelectedUser().getFirstName());
         getFollowDAO().create(bean);
@@ -181,9 +164,7 @@ public class FollowService {
 
     public FollowersCountResponse getFollowersCount(FollowersCountRequest request) {
         getCountCheck(request);
-
         UserBean userBean = getUserDAO().get(request.getTargetUser().getAlias());
-
         return new FollowersCountResponse(userBean.getFollower_count());
 
     }
@@ -227,12 +208,8 @@ public class FollowService {
 
     private boolean validateAuthToken(AuthToken authToken, String alias) {
         long currTime = System.currentTimeMillis();
-        System.out.println(currTime);
-        System.out.println(currTime - Long.parseLong(authToken.getDatetime()));
         if (currTime - Long.parseLong(authToken.getDatetime()) > 300000) {
-            if (authToken != null) {
-                getAuthTokenDAO().delete(authToken.getToken());
-            }
+            getAuthTokenDAO().delete(authToken.getToken());
             return false;
         }
         AuthTokenBean newAuthTokenBean = new AuthTokenBean(authToken.getToken(), Long.parseLong(authToken.getDatetime()), alias);

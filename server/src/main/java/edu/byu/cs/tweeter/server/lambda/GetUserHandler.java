@@ -11,7 +11,7 @@ public class GetUserHandler extends Handler implements RequestHandler<GetUserReq
 
     @Override
     public GetUserResponse handleRequest(GetUserRequest request, Context context) {
-        UserService userService = new UserService(getUserDao());
+        UserService userService = new UserService(getUserDao(), getAuthTokenDAO(),getImageDao());
         return userService.getUser(request);
     }
 }
